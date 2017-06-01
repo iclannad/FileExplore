@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/nav_main"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="horizontal">
+
+    <!--<View-->
+    <!--android:layout_width="fill_parent"-->
+    <!--android:layout_height="1dp"-->
+    <!--android:background="@color/light_gray" />-->
+
+    <RelativeLayout
+        android:id="@+id/nav1"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:gravity="center">
+
+        <LinearLayout
+            android:id="@+id/nav_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/nav_1_image"
+                android:layout_width="@dimen/nav_image"
+                android:layout_height="@dimen/nav_image"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/nav_1_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/nav"
+                android:textSize="@dimen/nav_text" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/nav_origin1_linear1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/nav_1"
+            android:visibility="gone">
+
+            <include
+                android:id="@+id/nav_origin1"
+                layout="@layout/origin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/nav2"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:gravity="center">
+
+        <LinearLayout
+            android:id="@+id/nav_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/nav_2_image"
+                android:layout_width="@dimen/nav_image"
+                android:layout_height="@dimen/nav_image"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/nav_2_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/nav"
+                android:textSize="@dimen/nav_text" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/nav_origin2_linear2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/nav_2"
+            android:visibility="gone">
+
+            <include
+                android:id="@+id/nav_origin2"
+                layout="@layout/origin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/nav3"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:gravity="center">
+
+        <LinearLayout
+            android:id="@+id/nav_3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/nav_3_image"
+                android:layout_width="@dimen/nav_image"
+                android:layout_height="@dimen/nav_image"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/nav_3_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/nav"
+                android:textSize="@dimen/nav_text" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/nav_origin3_linear3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/nav_3"
+            android:visibility="gone">
+
+            <include
+                android:id="@+id/nav_origin3"
+                layout="@layout/origin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/nav4"
+        android:layout_width="0dp"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"
+        android:gravity="center">
+
+        <LinearLayout
+            android:id="@+id/nav_4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/nav_4_image"
+                android:layout_width="@dimen/nav_image"
+                android:layout_height="@dimen/nav_image"
+                android:gravity="center" />
+
+            <TextView
+                android:id="@+id/nav_4_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/nav"
+                android:textSize="@dimen/nav_text" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/nav_origin4_linear4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/nav_4"
+            android:visibility="gone">
+
+            <include
+                android:id="@+id/nav_origin4"
+                layout="@layout/origin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+
+    </RelativeLayout>
+</LinearLayout>

@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/listview_item_linear"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/listview_item_selector"
+    android:descendantFocusability="beforeDescendants"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/item_linear1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/marginNormal"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ImageView
+            android:id="@+id/linear1_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/linear1_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/Black"
+            android:textSize="@dimen/listText" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/item_linear2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/marginNormal"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:id="@+id/linear2_linear"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:gravity="center_vertical">
+
+            <ImageView
+                android:id="@+id/item_icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="@dimen/marginNormal"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/linear2_relat"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/marginNormal"
+            android:layout_toRightOf="@id/linear2_linear">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="fill_parent"
+                android:gravity="center_vertical"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/item_content"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:textColor="@color/GreyDeep"
+                    android:textSize="@dimen/listTextNormal"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/item_msg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:maxEms="15"
+                    android:singleLine="true"
+                    android:textSize="@dimen/listTextSmall"
+                    android:visibility="gone" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <Button
+            android:id="@+id/item_but"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/item_setting_close"
+            layout="@layout/button_close"
+            android:layout_width="@dimen/listRightSettingWidth"
+            android:layout_height="@dimen/listRightSettingHeight"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="@dimen/marginNormal"
+            android:visibility="gone" />
+
+        <include
+            android:id="@+id/item_setting_open"
+            layout="@layout/button_open"
+            android:layout_width="@dimen/listRightSettingWidth"
+            android:layout_height="@dimen/listRightSettingHeight"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_margin="@dimen/marginNormal"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/item_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/marginNormal"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/item_image1"
+            android:layout_width="@dimen/listRightImageSmall"
+            android:layout_height="@dimen/listRightImageSmall"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="@dimen/marginNormal"
+            android:layout_toLeftOf="@id/item_image"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/item_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@id/item_image"
+            android:paddingRight="@dimen/marginNormal"
+            android:visibility="gone" />
+
+        <!--
+                显示新闻内容的布局
+                -->
+
+
+        <ImageView
+            android:id="@+id/item_linear4_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/marginNormal"
+            android:visibility="gone" />
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_below="@id/linear2_relat"
+            android:layout_marginLeft="@dimen/marginNormal"
+            android:layout_toRightOf="@id/item_linear4_icon"
+            android:padding="7dp">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/item_linear4_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:gravity="center_vertical"
+                    android:textSize="@dimen/listTextSmall"
+                    android:visibility="gone" />
+
+                <TextView
+                    android:id="@+id/item_linear4_msg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:maxEms="15"
+                    android:singleLine="true"
+                    android:textSize="@dimen/listText"
+                    android:visibility="gone" />
+
+                <com.example.administrator.ui_sdk.View.MyGridView
+                    android:id="@+id/item_linear4_girdview"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_marginRight="20dp"
+                    android:layout_marginTop="10dp"
+                    android:horizontalSpacing="2dp"
+                    android:numColumns="4"
+                    android:verticalSpacing="2dp"
+                    android:visibility="gone"></com.example.administrator.ui_sdk.View.MyGridView>
+
+                <LinearLayout
+                    android:id="@+id/item_linear4_linear"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/WhiteSmoke"
+                    android:orientation="horizontal"
+                    android:padding="10dp"
+                    android:visibility="gone">
+
+                    <ImageView
+                        android:id="@+id/item_linear4_linear_icon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:padding="5dp"
+                        android:visibility="gone" />
+
+                    <TextView
+                        android:id="@+id/item_linear4_linear_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="fill_parent"
+                        android:gravity="center_vertical"
+                        android:maxEms="15"
+                        android:singleLine="true"
+                        android:textSize="15sp"
+                        android:visibility="gone" />
+                </LinearLayout>
+            </LinearLayout>
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/item_linear3"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/WhiteSmoke"
+        android:visibility="gone">
+
+
+        <TextView
+            android:id="@+id/item_interval_title"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginLeft="5dp"
+            android:background="@color/WhiteSmoke"
+            android:gravity="center_vertical"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+</LinearLayout>

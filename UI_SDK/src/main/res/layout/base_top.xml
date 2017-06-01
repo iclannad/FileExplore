@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_centerVertical="true"
+    android:fitsSystemWindows="true"
+    android:paddingLeft="@dimen/marginNormal"
+    android:paddingRight="@dimen/marginNormal">
+
+    <RelativeLayout
+        android:id="@+id/base_top_relative"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_centerVertical="true"
+        android:padding="@dimen/marginNormal">
+
+        <ImageView
+            android:id="@+id/base_top_image"
+            android:layout_width="@dimen/marginBigger"
+            android:layout_height="@dimen/marginBigger"
+            android:layout_centerVertical="true"
+            android:src="@mipmap/left" />
+
+        <TextView
+            android:id="@+id/base_top_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@id/base_top_image"
+            android:gravity="center"
+            android:text="@string/back"
+            android:textColor="@color/Black"
+            android:textSize="@dimen/textsize_small" />
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/base_top_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:ellipsize="marquee"
+        android:gravity="center"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:maxEms="8"
+        android:singleLine="true"
+        android:text="@string/sample_str"
+        android:textColor="@color/Black"
+        android:textSize="@dimen/listText" />
+
+    <TextView
+        android:id="@+id/base_top_text1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:gravity="center"
+        android:text="@string/sample_str"
+        android:textColor="@color/Black"
+        android:textSize="@dimen/textsize_small" />
+
+    <ImageView
+        android:id="@+id/base_top_image1"
+        android:layout_width="@dimen/butHeight"
+        android:layout_height="fill_parent"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:gravity="center"
+        android:padding="@dimen/marginNormal"
+        android:visibility="gone" />
+</RelativeLayout>

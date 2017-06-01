@@ -1,0 +1,46 @@
+<resources>
+    <!-- Default screen margins, per the Android Design guidelines. -->
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+
+    <!-- 字体的大小-->
+    <dimen name="textsize_small">28sp</dimen>
+    <!-- 小一号字体-->
+    <dimen name="textsize_smaller">24sp</dimen>
+    <!-- listview的高度-->
+    <dimen name="itemHeight">100dp</dimen>
+    <!-- 文字的宽度-->
+    <dimen name="textWidth">80dp</dimen>
+    <!-- 按钮的高度-->
+    <dimen name="butHeight">80dp</dimen>
+
+    <dimen name="marginSmall">6dp</dimen>
+    <!-- 边距正常-->
+    <dimen name="marginNormal">10dp</dimen>
+    <!-- 编辑间隔-->
+    <dimen name="editMargin">16dp</dimen>
+    <!-- 边距大-->
+    <dimen name="marginBig">20dp</dimen>
+
+    <dimen name="marginBigger">30dp</dimen>
+
+    <!-- 边距大-->
+    <dimen name="marginBiggest">40dp</dimen>
+
+    <dimen name="listviewmaginTop">-70dp</dimen>
+    <dimen name="listviewProgressmargin">-80dp</dimen>
+    <dimen name="listviewProgress">60dp</dimen>
+
+
+
+    <dimen name="listText">36sp</dimen>
+    <dimen name="listTextNormal">30sp</dimen>
+    <dimen name="listTextSmall">24sp</dimen>
+    <dimen name="listRightSettingWidth">170dp</dimen>
+    <dimen name="listRightSettingHeight">50dp</dimen>
+    <dimen name="listRightImageSmall">50dp</dimen>
+
+
+    <dimen name="nav_image">50dp</dimen>
+    <dimen name="nav_text">24sp</dimen>
+</resources>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ListView</string>
+
+
+    <string name="xlistview_header_hint_normal">Pull down refresh</string>
+    <string name="xlistview_header_hint_ready">Undo refresh data</string>
+    <string name="xlistview_header_hint_loading">Is loading</string>
+    <string name="xlistview_header_last_time">Last update time:</string>
+    <string name="xlistview_footer_hint_normal">See more</string>
+    <string name="xlistview_footer_hint_ready">Lighten the load more</string>
+    <string name="back">Previous</string>
+    <string name="cancal">Cancal</string>
+    <string name="center">Done</string>
+    <string name="group_private">1</string>
+    <string name="group_public">1</string>
+    <string name="more">1</string>
+    <string name="nav_1">1</string>
+    <string name="nav">1</string>
+    <string name="nav_2">1</string>
+    <string name="nav_3">1</string>
+    <string name="people_hint">1</string>
+    <string name="release_edit">1</string>
+    <string name="sample_str">1</string>
+</resources>

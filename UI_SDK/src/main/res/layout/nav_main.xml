@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <!--<RelativeLayout-->
+        <!--android:id="@+id/nav_Relative"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:layout_alignParentBottom="true">-->
+
+        <!--&lt;!&ndash; 这个布局是用于使用添加导航的布局&ndash;&gt;-->
+        <!--<LinearLayout-->
+            <!--android:id="@+id/nav_nav"-->
+            <!--android:layout_width="fill_parent"-->
+            <!--android:layout_height="fill_parent"-->
+            <!--android:orientation="horizontal"></LinearLayout>-->
+    <!--</RelativeLayout>-->
+
+
+    <android.support.v4.widget.DrawerLayout
+        android:id="@+id/activity_drawer_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <include layout="@layout/nav_content" />
+
+        <LinearLayout
+            android:id="@+id/nav_LeftView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="start"
+            android:orientation="vertical"></LinearLayout>
+        <!--<include layout="@layout/nav_menu" />-->
+    </android.support.v4.widget.DrawerLayout>
+
+    <!-- 这个导航上面的内容布局文件的布局-->
+    <!--<LinearLayout-->
+        <!--android:id="@+id/nav_contentView"-->
+        <!--android:layout_width="fill_parent"-->
+        <!--android:layout_height="fill_parent"-->
+        <!--android:layout_above="@id/nav_Relative"-->
+        <!--android:orientation="horizontal"></LinearLayout>-->
+
+
+</RelativeLayout>

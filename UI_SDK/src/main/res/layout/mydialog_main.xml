@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/dialog_linear"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/dialog1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/dialog_content"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/marginBig"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:textColor="@color/Black"
+            android:textSize="@dimen/textsize_small" />
+
+
+        <LinearLayout
+            android:id="@+id/dialog_bottom"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:gravity="right"
+            android:layout_marginRight="@dimen/marginNormal"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/dialog_left_but"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/marginBig"
+                android:background="@drawable/itemsector"
+                android:textColor="@color/Black"
+                android:textSize="@dimen/textsize_small" />
+
+            <TextView
+                android:id="@+id/dialog_right_but"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="@dimen/marginBig"
+                android:background="@drawable/itemsector"
+                android:textColor="@color/Black"
+                android:textSize="@dimen/textsize_small" />
+        </LinearLayout>
+
+
+        <EditText
+            android:id="@+id/dialog_edit"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/dialog_bottom"
+            android:layout_below="@id/dialog_content"
+            android:layout_margin="@dimen/marginNormal"
+            android:textColor="@color/Black"
+            android:textColorHint="@color/light_gray"
+            android:textSize="@dimen/textsize_small"
+            android:visibility="gone" />
+
+        <ListView
+            android:id="@+id/dialog_listview"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@id/dialog_bottom"
+            android:layout_below="@id/dialog_content"
+            android:visibility="gone"></ListView>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/dialog2"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_margin="@dimen/marginBig"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/dialog2_progress"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:gravity="center_vertical" />
+
+        <TextView
+            android:id="@+id/dialog2_content"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginLeft="@dimen/marginBig"
+            android:gravity="center_vertical"
+            android:textColor="@color/White"
+            android:textSize="@dimen/marginBiggest" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/dialog3"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        tools:targetApi="honeycomb">
+
+        <NumberPicker
+            android:id="@+id/dialog_numberpicker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"></NumberPicker>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/mydialog4"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <GridView
+            android:id="@+id/dialog4_gridview"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:numColumns="3"></GridView>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/dialog5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+
+        <DatePicker
+            android:id="@+id/dialog_datapicker"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"></DatePicker>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/dialog_bottom1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="@dimen/marginBig"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/dialog3_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/listview_item_selector"
+            android:gravity="center"
+            android:padding="@dimen/marginBig"
+            android:text="@string/cancal"
+            android:textColor="@color/Black"
+            android:textSize="@dimen/textsize_small" />
+
+        <TextView
+            android:id="@+id/dialog3_text1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/listview_item_selector"
+            android:gravity="center"
+            android:padding="@dimen/marginBig"
+            android:text="@string/center"
+            android:textColor="@color/Black"
+            android:textSize="@dimen/textsize_small" />
+    </LinearLayout>
+
+</RelativeLayout>

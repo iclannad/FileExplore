@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:gravity="bottom" >
+
+    <RelativeLayout
+        android:id="@+id/xlistview_header_content"
+        android:layout_width="fill_parent"
+        android:layout_height="@dimen/itemHeight" >
+
+        <LinearLayout
+            android:id="@+id/xlistview_header_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/xlistview_header_hint_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/textsize_small"
+                android:text="@string/xlistview_header_hint_normal" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/marginSmall" >
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/xlistview_header_last_time"
+                    android:textSize="@dimen/textsize_small" />
+
+                <TextView
+                    android:id="@+id/xlistview_header_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/textsize_small" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/xlistview_header_arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/xlistview_header_text"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/listviewmaginTop"
+           />
+
+        <ProgressBar
+            android:id="@+id/xlistview_header_progressbar"
+            android:layout_width="@dimen/listviewProgress"
+            android:layout_height="@dimen/listviewProgress"
+            android:layout_alignLeft="@id/xlistview_header_text"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/listviewProgressmargin"
+            android:visibility="invisible" />
+    </RelativeLayout>
+
+</LinearLayout>

@@ -1,0 +1,1 @@
+include ':app', ':UI_SDK', ':httpdemo',':Widgets'

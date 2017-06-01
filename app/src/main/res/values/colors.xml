@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+
+    <color name="result_view">#b0000000</color>
+    <color name="viewfinder_mask">#60000000</color>
+    <color name="possible_result_points">#c0ffff00</color>
+    <color name="TitleTextColor">#333333</color>
+    <color name="blue_background">#33CCFF</color>
+    <color name="statusbar_bg">#4876FF</color>
+    <color name="actionbarcolor">#4876FF</color>
+    <color name="back">#33AAFF</color>
+    <color name="mydeviceback">#DCDDF0</color>
+    <color name="toolback">#00A8FF</color>
+    <color name="filepath">#DDDDDD</color>
+    <color name="buttomback">#1F70FF</color>
+    <color name="caption">#909090</color>
+    <color name="title_select">#00A2E9</color>
+    <color name="title_color">#009BE2</color>
+    <color name="list_back">#F5F5F5</color>
+    <color name="list_textcolor">#6A6A6A</color>
+    <color name="logincolor">#00A8FF</color>
+
+
+    <color name="Grey">#c0c0c0</color>
+    <color name="GreySmork">#ececec</color>
+    <color name="GreyBack">#d1d1d1</color>
+    <color name="Greyer">#747474</color>
+    <color name="White">#ffffff</color>
+
+
+
+    <color name="MainColorBlue">#3a6bf8</color>
+    <color name="MainColorGreen">#01cec9</color>
+    <color name="MainColorRed">#ff6c6c</color>
+    <color name="MainColorPuplor">#6766cc</color>
+
+
+    <color name="Puplor">#5759be</color>
+    <color name="Blue">#2f60ed</color>
+    <color name="Green">#00c4bf</color>
+    <color name="Red">#f25e5c</color>
+</resources>
