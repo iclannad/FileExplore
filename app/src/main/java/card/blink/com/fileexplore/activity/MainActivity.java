@@ -263,6 +263,7 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                 } catch (IOException e) {
                     //e.printStackTrace();
                     handler.sendEmptyMessage(ERROR);
+
                 }
             }
         }.start();
