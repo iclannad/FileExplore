@@ -1,24 +1,24 @@
 package card.blink.com.fileexplore.activity;
 
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.administrator.ui_sdk.MyBaseActivity.BaseActivity;
 import com.google.gson.Gson;
-import com.squareup.okhttp.MediaType;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
-import com.squareup.okhttp.ResponseBody;
+import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.FileCallBack;
 
+import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -26,12 +26,19 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.OnClick;
 import card.blink.com.fileexplore.R;
 import card.blink.com.fileexplore.adapter.FileListAdapter;
 import card.blink.com.fileexplore.adapter.Protocol;
 import card.blink.com.fileexplore.gson.FileListData;
+import card.blink.com.fileexplore.tools.Comment;
 import card.blink.com.fileexplore.view.MyProgressDIalog;
+import okhttp3.Call;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 public class MainActivity extends BaseActivity implements AdapterView.OnItemClickListener {
 
@@ -290,7 +297,18 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                 postRequest(currentPath);
                 break;
             case Protocol.FL:
-                Log.v(TAG, "暂时不处理点击文件的操作");
+                Log.i(TAG, "点击直接下载文件 name == " + name);
+                String urlDownload = currentPath + "/" + name;
+                Log.i(TAG, "urlDownload===" + urlDownload);
+                if (urlDownload.endsWith(".mp4")) {
+                    Log.i(TAG, "在线播放");
+                    playOnlineFile(urlDownload);
+
+                } else {
+                    Log.i(TAG, "直接下载文件");
+                    downloadFile(urlDownload);
+                }
+
                 break;
             case Protocol.PAN:
                 currentPath = currentPath + name;
@@ -301,6 +319,64 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
             default:
                 break;
         }
+    }
+
+    /**
+     * 处理在线播放,现在只支持mp4格式
+     *
+     * @param url
+     */
+    private void playOnlineFile(String url) {
+        url = Comment.HOST + url;
+        Log.e(TAG, "downloadFile url===" + url);
+
+        Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
+        Uri data = Uri.parse(url);
+        intent.setDataAndType(data, "video/mp4");
+        try {
+            startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 处理下载文件，保存路径在根目录
+     *
+     * @param urlDownload
+     */
+    private void downloadFile(String urlDownload) {
+        String url = Comment.HOST + urlDownload;
+        Log.e(TAG, "downloadFile url===" + url);
+        String[] strings = url.split("/");
+        final String fileName = strings[strings.length - 1];
+        Log.i(TAG, "fileName===" + fileName);
+        Toast.makeText(this,"文件：" + fileName + "开始下载",Toast.LENGTH_SHORT).show();
+
+        OkHttpUtils//
+                .get()//
+                .url(url)//
+                .build()//
+                .execute(new FileCallBack(Environment.getExternalStorageDirectory().getAbsolutePath(), fileName)//
+                {
+
+                    @Override
+                    public void onError(Call call, Exception e, int id) {
+                        Log.e(TAG, "onError");
+                    }
+
+                    @Override
+                    public void onResponse(File response, int id) {
+                        Log.i(TAG, "response===" + response.getAbsolutePath());
+                        Toast.makeText(MainActivity.this,"文件：" + fileName + "下载完毕",Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void inProgress(float progress, long total, int id) {
+                        super.inProgress(progress, total, id);
+                        Log.d(TAG, "inProgress===" + progress * 100);
+                    }
+                });
     }
 
 

@@ -5,7 +5,7 @@ package card.blink.com.fileexplore.tools;
  */
 public class Comment {
     // url
-    public final static String HOST = "http://192.168.16.1:8080/cgi-bin/dir_list.cgi";
+    public final static String HOST = "http://192.168.16.1:8080/media";
 
 
 }

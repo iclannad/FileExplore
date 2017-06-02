@@ -25,9 +25,11 @@ dependencies {
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile project(':UI_SDK')
     compile 'com.jakewharton:butterknife:6.1.0'
-    compile 'com.squareup.okhttp:okhttp:2.4.0'
-    compile 'com.squareup.okio:okio:1.5.0'
+//    compile 'com.squareup.okhttp:okhttp:2.4.0'
+//    compile 'com.squareup.okio:okio:1.5.0'
     compile 'com.google.code.gson:gson:2.6.2'
     compile project(':Widgets')
     compile files('libs/meterial_library.jar')
+    compile 'com.zhy:okhttputils:2.6.2'
+
 }
