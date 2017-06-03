@@ -8,7 +8,9 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.text.LoginFilter;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.SimpleAdapter;
 
 import com.gc.materialdesign.widgets.ProgressDialog;
 import com.google.gson.Gson;
@@ -27,6 +29,7 @@ import java.util.Arrays;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import card.blink.com.httpdemo.view.PullToRefreshListView;
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -59,12 +62,29 @@ public class MainActivity extends Activity {
     @InjectView(R.id.btn7)
     Button btn7;
 
+    @InjectView(R.id.lv)
+    PullToRefreshListView lv;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,android.R.layout.simple_list_item_1,
+                android.R.id.text1,
+                new String[] {"item1","item2","item3"});
+        lv.setAdapter(adapter);
+        lv.setonRefreshListener(new PullToRefreshListView.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Log.v(TAG, "下拉刷新,请求刷新");
+                //lv.onRefreshComplete();
+            }
+
+        });
+
     }
 
     @OnClick(R.id.btn7)
@@ -89,7 +109,7 @@ public class MainActivity extends Activity {
     public static byte[] longToBytes(long l) {
         byte[] result = new byte[8];
         for (int i = 7; i >= 0; i--) {
-            result[i] = (byte)(l & 0xFF);
+            result[i] = (byte) (l & 0xFF);
             l >>= 8;
         }
         return result;
@@ -121,9 +141,9 @@ public class MainActivity extends Activity {
         Request request = new Request.Builder()
                 .url("http://192.168.16.1:8080/cgi-bin/upload_files.cgi")
                 .post(body)
-                .addHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8")
+                .addHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
                 .addHeader("authorization", "Basic YWRtaW46YWRtaW4=")
-                .addHeader("Content-Length","100632")
+                .addHeader("Content-Length", "100632")
                 .addHeader("cache-control", "no-cache")
                 .build();
 

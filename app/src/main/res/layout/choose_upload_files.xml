@@ -6,10 +6,10 @@
     android:orientation="vertical"
     tools:context=".activity.MainActivity">
 
-    <card.blink.com.fileexplore.view.PullToRefreshListView
+    <ListView
         android:id="@+id/lv"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></card.blink.com.fileexplore.view.PullToRefreshListView>
+        android:layout_height="match_parent"></ListView>
 
 
 </LinearLayout>

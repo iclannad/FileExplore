@@ -32,6 +32,7 @@ import card.blink.com.fileexplore.adapter.Protocol;
 import card.blink.com.fileexplore.gson.FileListData;
 import card.blink.com.fileexplore.tools.Comment;
 import card.blink.com.fileexplore.view.MyProgressDIalog;
+import card.blink.com.fileexplore.view.PullToRefreshListView;
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -47,7 +48,7 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
 
 
     @InjectView(R.id.lv)
-    ListView lv;
+    PullToRefreshListView lv;
 
     private FileListAdapter fileListAdapter;
     public String currentPath = "/";
@@ -67,6 +68,9 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                 case SUCCESS:
                     // 关闭对话框
                     MyProgressDIalog.getInstance(MainActivity.this).dissmissProgress();
+                    if (lv != null) {
+                        lv.onRefreshComplete();
+                    }
                     Log.i(TAG, "获取数据成功");
                     FileListData data = (FileListData) msg.obj;
                     handlerSuccessEvent(data);
@@ -118,6 +122,17 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                 list.add(pair);
             }
         }
+
+        // 是否显示上传文件功能
+        if (currentPath.endsWith("/")) {
+            Log.i(TAG, "不显示上传功能");
+            ShowUpload(false);
+        } else {
+            Log.i(TAG, "显示上传功能");
+            ShowUpload(true);
+        }
+
+
         // 如果两个都为null，说明当前处于根目录
         if (folders == null && documents == null) {
             if (disks != null) {
@@ -151,11 +166,14 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
 
         setTitle("文件浏览");
         setLeftTitle("返回");
-        setRightTitle("刷新");
+        setRightTitle("上传文件");
         setLeftTitleColor(R.color.White);
         setRightTitleColor(R.color.White);
         setTopTitleColor(R.color.White);
-        setTopColor(R.color.Blue);
+        setTopColor(R.color.logincolor);
+
+        Log.i(TAG, "不显示上传功能");
+        ShowUpload(false);
 
 
         //lv = (ListView) view.findViewById(R.id.lv);
@@ -163,6 +181,15 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
         fileListAdapter = new FileListAdapter(this, list);
         lv.setAdapter(fileListAdapter);
         lv.setOnItemClickListener(this);
+        lv.setonRefreshListener(new PullToRefreshListView.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                Log.i(TAG, "下拉成功，刷新操作开始");
+                //lv.onRefreshComplete();
+                MyProgressDIalog.getInstance(MainActivity.this).setContent("获取文件信息……").showProgressDialog();
+                postRequest(currentPath);
+            }
+        });
 
         AllFile();
 
@@ -213,8 +240,7 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
      */
     @Override
     public void setRightTextClick(View v) {
-        MyProgressDIalog.getInstance(this).setContent("获取文件信息……").showProgressDialog();
-        postRequest(currentPath);
+        startActivityForResult(new Intent(this, ChooseUploadFileActivity.class), 1);
     }
 
     /**
@@ -351,7 +377,7 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
         String[] strings = url.split("/");
         final String fileName = strings[strings.length - 1];
         Log.i(TAG, "fileName===" + fileName);
-        Toast.makeText(this,"文件：" + fileName + "开始下载",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "文件：" + fileName + "开始下载", Toast.LENGTH_SHORT).show();
 
         OkHttpUtils//
                 .get()//
@@ -368,7 +394,7 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                     @Override
                     public void onResponse(File response, int id) {
                         Log.i(TAG, "response===" + response.getAbsolutePath());
-                        Toast.makeText(MainActivity.this,"文件：" + fileName + "下载完毕",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, "文件：" + fileName + "下载完毕", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -379,10 +405,43 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                 });
     }
 
+    /**
+     * 将手机中的文件上传至u盘中
+     *
+     * @param path
+     */
+    public void uploadFile(String path) {
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.v(TAG, "requestCode==" + requestCode);
+        Log.v(TAG, "resultCode==" + resultCode);
+        if (requestCode == 1 && resultCode == 1) {
+            String path = data.getStringExtra("path");
+            Log.v(TAG, "path==" + path);
+            Log.d(TAG, "请求码和结果码都正确，可以向服务器上传数据");
+            uploadFile(path);
+        }
+
+    }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        position = position - 1;
+        Log.v(TAG, "position==" + position);
         onclickfile(position);
+    }
+
+    /**
+     * 是否显示右边的上传功能
+     *
+     * @param isShow
+     */
+    public void ShowUpload(boolean isShow) {
+        setRightTitleVisiable(isShow);
     }
 
     private long exitTime = 0;
