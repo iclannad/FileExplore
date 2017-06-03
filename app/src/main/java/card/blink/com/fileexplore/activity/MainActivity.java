@@ -22,6 +22,7 @@ import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.ButterKnife;
@@ -31,6 +32,7 @@ import card.blink.com.fileexplore.adapter.FileListAdapter;
 import card.blink.com.fileexplore.adapter.Protocol;
 import card.blink.com.fileexplore.gson.FileListData;
 import card.blink.com.fileexplore.tools.Comment;
+import card.blink.com.fileexplore.tools.Tools;
 import card.blink.com.fileexplore.view.MyProgressDIalog;
 import card.blink.com.fileexplore.view.PullToRefreshListView;
 import okhttp3.Call;
@@ -54,6 +56,7 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
     public String currentPath = "/";
     public static final int ERROR = -1;
     public static final int SUCCESS = 1;
+    public static final int UPLOAD_SUCCESS = 2;
 
     Handler handler = new Handler() {
         @Override
@@ -74,6 +77,11 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                     Log.i(TAG, "获取数据成功");
                     FileListData data = (FileListData) msg.obj;
                     handlerSuccessEvent(data);
+                    break;
+                case UPLOAD_SUCCESS:
+                    Log.i(TAG, "上传文件成功");
+                    String fileName = (String) msg.obj;
+                    Toast.makeText(MainActivity.this, "文件：" + fileName + "上传成功", Toast.LENGTH_SHORT).show();
                     break;
                 default:
 
@@ -406,12 +414,158 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
     }
 
     /**
-     * 将手机中的文件上传至u盘中
+     * 将手机中的文件上传至u盘中, 在子线程中传输
      *
      * @param path
+     * @param uploadPath
      */
-    public void uploadFile(String path) {
+    public void uploadFileToExternalStorage(String path, final String uploadPath) {
+        final File file = new File(path);
+        new Thread() {
+            @Override
+            public void run() {
+                postUploadFileRequest(file, uploadPath);
+            }
+        }.start();
+    }
 
+    /**
+     * 发生上传文件的请求
+     *
+     * @param file
+     * @param uploadPath
+     */
+    private void postUploadFileRequest(File file, String uploadPath) {
+        final int SIZE = 5 * 1024 * 1024;
+        long length = file.length();
+        Log.v(TAG, "jd.rar的长度 length==" + length);
+        long count = length / SIZE;
+
+        if (length % SIZE == 0) {
+
+        } else {
+            count++;
+        }
+        Log.v(TAG, "需要分割成的块数是 count===" + count);
+
+        int index = 1;
+        while (index <= count) {
+            // 请求上传index块
+            uploading(file, index, count, uploadPath);
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            index++;
+        }
+
+    }
+
+    private void uploading(File file, int index, long count, String uploadPath) {
+        byte[] content = getDataFromLocalFile(file, index, count, uploadPath);
+        Log.i(TAG, "btn");
+        OkHttpClient client = new OkHttpClient();
+
+        // 生成body
+        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+        RequestBody body = RequestBody.create(mediaType, content);
+
+        Request request = new Request.Builder()
+                .url("http://192.168.16.1:8080/cgi-bin/upload_files.cgi")
+                .post(body)
+                .addHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+                .addHeader("authorization", "Basic YWRtaW46YWRtaW4=")
+                .addHeader("Content-Length", content.length + "")
+                .addHeader("cache-control", "no-cache")
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            Log.i(TAG, "response==" + response.toString());
+            ResponseBody responseBody = response.body();
+            Log.i(TAG, "responseBody==" + responseBody.toString());
+            String string = responseBody.string();
+            Log.i(TAG, "responseBody.string()==" + string);
+
+            // 发送上传成功信息
+            Message msg = Message.obtain();
+            msg.what = UPLOAD_SUCCESS;
+            String[] strings = uploadPath.split("/");
+            String name = strings[strings.length - 1];
+            Log.v(TAG, "name===" + name);
+            msg.obj = name;
+            handler.sendMessage(msg);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * 封装要上传的数组
+     *
+     * @param file
+     * @param index
+     * @param count
+     * @param uploadPath
+     * @return
+     */
+    private byte[] getDataFromLocalFile(File file, int index, long count, String uploadPath) {
+        long length = file.length();
+        // empty
+        byte[] postmsg = new byte[280];
+
+        //String path = "/mount1/myjd4.rar";
+        String path = uploadPath;
+        Log.v(TAG, "uploadPath == " + uploadPath);
+        byte[] pathBytes = path.getBytes();
+        // 填充路径
+        for (int i = 0; i < pathBytes.length; i++) {
+            postmsg[i] = pathBytes[i];
+        }
+        Log.i(TAG, "postmsg===" + Arrays.toString(postmsg));
+
+        long block = index;
+        long blocksize = count;
+        long filesize = length;
+
+        byte[] indexs = Tools.longToBytes(index);
+        byte[] counts = Tools.longToBytes(count);
+        byte[] filesizes = Tools.longToBytes(filesize);
+
+        Log.v(TAG, "indexs==" + Arrays.toString(indexs));
+        indexs = Tools.resortBytes(indexs);
+        Log.v(TAG, "indexs==" + Arrays.toString(indexs));
+
+        Log.v(TAG, "counts==" + Arrays.toString(counts));
+        counts = Tools.resortBytes(counts);
+        Log.v(TAG, "counts==" + Arrays.toString(counts));
+
+        Log.v(TAG, "filesizes==" + Arrays.toString(filesizes));
+        filesizes = Tools.resortBytes(filesizes);
+        Log.v(TAG, "filesizes==" + Arrays.toString(filesizes));
+
+        for (int i = 0; i < indexs.length; i++) {
+            postmsg[256 + i] = indexs[i];
+        }
+        for (int i = 0; i < counts.length; i++) {
+            postmsg[256 + 8 + i] = counts[i];
+        }
+        for (int i = 0; i < filesizes.length; i++) {
+            postmsg[256 + 8 + 8 + i] = filesizes[i];
+        }
+
+        byte[] fSize = Tools.readFileToBytes(file, index, count);
+        int size = postmsg.length + fSize.length;
+        Log.i(TAG, "size==" + size + "---postmg.length==" + postmsg.length + "---fSize.length===" + fSize.length);
+        byte[] content = new byte[size];
+        for (int i = 0; i < content.length; i++) {
+            content[i] = i < postmsg.length ? postmsg[i] : fSize[i - postmsg.length];
+        }
+        Log.i(TAG, "content===" + Arrays.toString(content));
+
+        return content;
     }
 
     @Override
@@ -423,7 +577,12 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
             String path = data.getStringExtra("path");
             Log.v(TAG, "path==" + path);
             Log.d(TAG, "请求码和结果码都正确，可以向服务器上传数据");
-            uploadFile(path);
+            Log.v(TAG, "currentPath===" + currentPath);
+            String[] strings = path.split("/");
+            String uploadPath = currentPath + "/" + strings[strings.length - 1];
+            Log.v(TAG, "uploadPath===" + uploadPath);
+            Toast.makeText(this, "开始上传文件:" + strings[strings.length - 1], Toast.LENGTH_SHORT).show();
+            uploadFileToExternalStorage(path, uploadPath);
         }
 
     }

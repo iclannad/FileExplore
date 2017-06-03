@@ -4,6 +4,9 @@ import android.os.Environment;
 import android.util.Log;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -88,4 +91,96 @@ public class Tools {
         }
         return list;
     }
+
+    /**
+     * long to byte[]
+     *
+     * @param l
+     * @return
+     */
+    public static byte[] longToBytes(long l) {
+        byte[] result = new byte[8];
+        for (int i = 7; i >= 0; i--) {
+            result[i] = (byte) (l & 0xFF);
+            l >>= 8;
+        }
+        return result;
+    }
+
+    /**
+     * byte[] to long
+     *
+     * @param b
+     * @return
+     */
+    public static long bytesToLong(byte[] b) {
+        long result = 0;
+        for (int i = 0; i < 8; i++) {
+            result <<= 8;
+            result |= (b[i] & 0xFF);
+        }
+        return result;
+    }
+
+
+    /**
+     * 去除数组前面的0，如 00002000，可转化为2000，返回数组的长度为发生变化
+     *
+     * @param array
+     * @return
+     */
+    public static byte[] resortBytes(byte[] array) {
+        int length = array.length;
+        int index = 0;
+        for (int i = 0; i < length; i++) {
+            if (array[i] != 0) {
+                break;
+            }
+            index++;
+        }
+        byte[] content = new byte[(length - index)];
+
+        for (int i = index; i < array.length; i++) {
+            content[i - index] = array[i];
+
+        }
+
+        return content;
+    }
+
+    /**
+     * 将文件的数据读取到字节数组中，每次最多读取5M的大小
+     *
+     * @param file
+     * @param index
+     * @param total
+     * @return
+     */
+    public static byte[] readFileToBytes(File file, int index, long total) {
+        final int SIZE = 5 * 1024 * 1024;
+        try {
+            RandomAccessFile raf = new RandomAccessFile(file, "rw");
+            raf.seek((index - 1) * SIZE);
+            byte[] data;
+            if (index == total) {
+                int size = (int) (file.length() % SIZE);
+                data = new byte[size];
+            } else {
+                data = new byte[SIZE];
+
+            }
+
+            int read = raf.read(data);
+            raf.close();
+
+            return data;
+        } catch (FileNotFoundException e) {
+            //e.printStackTrace();
+            return null;
+        } catch (IOException e) {
+            //e.printStackTrace();
+            return null;
+        }
+    }
+
 }
