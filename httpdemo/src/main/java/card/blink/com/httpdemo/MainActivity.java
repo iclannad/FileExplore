@@ -62,6 +62,9 @@ public class MainActivity extends Activity {
     @InjectView(R.id.btn7)
     Button btn7;
 
+    @InjectView(R.id.btn8)
+    Button btn8;
+
     @InjectView(R.id.lv)
     PullToRefreshListView lv;
 
@@ -72,19 +75,221 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this,android.R.layout.simple_list_item_1,
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1,
                 android.R.id.text1,
-                new String[] {"item1","item2","item3"});
+                new String[]{"item1", "item2", "item3"});
         lv.setAdapter(adapter);
         lv.setonRefreshListener(new PullToRefreshListView.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                Log.v(TAG, "下拉刷新,请求刷新");
-                //lv.onRefreshComplete();
+                Log.v(TAG, "下拉刷新成功");
+                lv.onRefreshComplete();
             }
 
         });
 
+    }
+
+    /**
+     * 测试上传大文件
+     */
+    @OnClick(R.id.btn8)
+    public void uploadBigFile() {
+        Log.v(TAG, "上传大文件");
+        final File file = new File(Environment.getExternalStorageDirectory().toString(), "jd.rar");
+        String fileAbsolutePath = file.getAbsolutePath();
+        Log.i(TAG, "fileAbsolutePath==" + fileAbsolutePath);
+        long length = file.length();
+        Log.i(TAG, "length==" + length);
+
+        new Thread() {
+            @Override
+            public void run() {
+                postUploadBigFileRequest(file);
+            }
+        }.start();
+
+
+    }
+
+    /**
+     * 上传大文件 子线程
+     *
+     * @param file
+     */
+    private void postUploadBigFileRequest(File file) {
+        final int SIZE = 5 * 1024 * 1024;
+        long length = file.length();
+        Log.v(TAG, "jd.rar的长度 length==" + length);
+        long count = length / SIZE;
+
+        if (length % SIZE == 0) {
+
+        } else {
+            count++;
+        }
+        Log.v(TAG, "需要分割成的块数是 count===" + count);
+
+        int index = 1;
+        while (index <= count) {
+            // 请求下载index块
+            uploading(file, index, count);
+            try {
+                Thread.sleep(20);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            index++;
+
+        }
+
+
+    }
+
+
+    private void uploading(File file, int index, long count) {
+        byte[] content = getDataFromLocalBigFile(file, index, count);
+        Log.i(TAG, "btn");
+        OkHttpClient client = new OkHttpClient();
+
+        // 生成body
+        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
+        RequestBody body = RequestBody.create(mediaType, content);
+
+        Request request = new Request.Builder()
+                .url("http://192.168.16.1:8080/cgi-bin/upload_files.cgi")
+                .post(body)
+                .addHeader("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+                .addHeader("authorization", "Basic YWRtaW46YWRtaW4=")
+                .addHeader("Content-Length", content.length + "")
+                .addHeader("cache-control", "no-cache")
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            Log.i(TAG, "response==" + response.toString());
+            ResponseBody responseBody = response.body();
+            Log.i(TAG, "responseBody==" + responseBody.toString());
+            String string = responseBody.string();
+            Log.i(TAG, "responseBody.string()==" + string);
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private byte[] getDataFromLocalBigFile(File file, int index, long count) {
+        long length = file.length();
+
+        // empty
+        byte[] postmsg = new byte[280];
+
+        String path = "/mount1/myjd4.rar";
+        byte[] pathBytes = path.getBytes();
+        // 填充路径
+        for (int i = 0; i < pathBytes.length; i++) {
+            postmsg[i] = pathBytes[i];
+        }
+        Log.i(TAG, "postmsg===" + Arrays.toString(postmsg));
+
+        long block = index;
+        long blocksize = count;
+        long filesize = length;
+
+        byte[] indexs = longToBytes(index);
+        byte[] counts = longToBytes(count);
+        byte[] filesizes = longToBytes(filesize);
+
+        Log.v(TAG, "indexs==" + Arrays.toString(indexs));
+        indexs = MySort(indexs);
+        Log.v(TAG, "indexs==" + Arrays.toString(indexs));
+
+        Log.v(TAG, "counts==" + Arrays.toString(counts));
+        counts = MySort(counts);
+        Log.v(TAG, "counts==" + Arrays.toString(counts));
+
+        Log.v(TAG, "filesizes==" + Arrays.toString(filesizes));
+        filesizes = MySort(filesizes);
+        Log.v(TAG, "filesizes==" + Arrays.toString(filesizes));
+
+        for (int i = 0; i < indexs.length; i++) {
+            postmsg[256 + i] = indexs[i];
+        }
+        for (int i = 0; i < counts.length; i++) {
+            postmsg[256 + 8 + i] = counts[i];
+        }
+        for (int i = 0; i < filesizes.length; i++) {
+            postmsg[256 + 8 + 8 + i] = filesizes[i];
+        }
+
+        byte[] fSize = readBigFile(file, index, count);
+        int size = postmsg.length + fSize.length;
+        Log.i(TAG, "size==" + size + "---postmg.length==" + postmsg.length + "---fSize.length===" + fSize.length);
+        byte[] content = new byte[size];
+        for (int i = 0; i < content.length; i++) {
+            content[i] = i < postmsg.length ? postmsg[i] : fSize[i - postmsg.length];
+        }
+        Log.i(TAG, "content===" + Arrays.toString(content));
+
+
+        return content;
+    }
+
+
+    private byte[] readBigFile(File file, int index, long count) {
+        final int SIZE = 5 * 1024 * 1024;
+        try {
+            RandomAccessFile raf = new RandomAccessFile(file, "rw");
+            raf.seek((index - 1) * SIZE);
+            byte[] data;
+            if (index == count) {
+                int size = (int) (file.length() % SIZE);
+                Log.v(TAG, "size==" + size);
+                data = new byte[size];
+            } else {
+                data = new byte[SIZE];
+                Log.v(TAG, "SIZE==" + SIZE);
+            }
+
+
+            int read = raf.read(data);
+            Log.i(TAG, "read==" + read);
+            raf.close();
+
+            return data;
+        } catch (FileNotFoundException e) {
+            //e.printStackTrace();
+            return null;
+        } catch (IOException e) {
+            //e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    private byte[] MySort(byte[] array) {
+        int length = array.length;
+        int index = 0;
+        for (int i = 0; i < length; i++) {
+            if (array[i] != 0) {
+                break;
+            }
+            index++;
+        }
+
+
+        byte[] content = new byte[(length - index)];
+
+
+        for (int i = index; i < array.length; i++) {
+            content[i - index] = array[i];
+
+        }
+
+
+        return content;
     }
 
     @OnClick(R.id.btn7)
@@ -177,7 +382,7 @@ public class MainActivity extends Activity {
         // empty
         byte[] postmsg = new byte[280];
 
-        String path = "/mount1/mytest.xls";
+        String path = "/mount1/mytest1.xls";
         byte[] pathBytes = path.getBytes();
         // 填充路径
         for (int i = 0; i < pathBytes.length; i++) {
