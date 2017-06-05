@@ -116,6 +116,11 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                 FileListData.Folder folder = folders[i];
                 String name = folder.name;
                 pair.setA(name);
+
+                long time = folder.time;
+                pair.setTime(time);
+
+                pair.setUpan(true);
                 list.add(pair);
             }
         }
@@ -127,6 +132,13 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                 FileListData.Document document = documents[i];
                 String name = document.name;
                 pair.setA(name);
+
+                long time = document.time;
+                pair.setTime(time);
+                String size = document.size;
+                pair.setSize(size);
+
+                pair.setUpan(true);
                 list.add(pair);
             }
         }
@@ -408,7 +420,7 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                     @Override
                     public void inProgress(float progress, long total, int id) {
                         super.inProgress(progress, total, id);
-                        Log.d(TAG, "inProgress===" + progress * 100);
+                        Log.d(TAG, "fileName===" + fileName + " inProgress===" + progress * 100);
                     }
                 });
     }
@@ -488,14 +500,18 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
             String string = responseBody.string();
             Log.i(TAG, "responseBody.string()==" + string);
 
-            // 发送上传成功信息
-            Message msg = Message.obtain();
-            msg.what = UPLOAD_SUCCESS;
-            String[] strings = uploadPath.split("/");
-            String name = strings[strings.length - 1];
-            Log.v(TAG, "name===" + name);
-            msg.obj = name;
-            handler.sendMessage(msg);
+            Log.v(TAG, "index===" + index + "   count===" + count);
+            // 上传最后一块完成时，文件上传成功
+            if (index == count) {
+                // 发送上传成功信息
+                Message msg = Message.obtain();
+                msg.what = UPLOAD_SUCCESS;
+                String[] strings = uploadPath.split("/");
+                String name = strings[strings.length - 1];
+                Log.v(TAG, "name===" + name);
+                msg.obj = name;
+                handler.sendMessage(msg);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -557,6 +573,7 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
         }
 
         byte[] fSize = Tools.readFileToBytes(file, index, count);
+        // 拼接postmsg和fSize两个数组
         int size = postmsg.length + fSize.length;
         Log.i(TAG, "size==" + size + "---postmg.length==" + postmsg.length + "---fSize.length===" + fSize.length);
         byte[] content = new byte[size];

@@ -24,11 +24,19 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.TimeZone;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import card.blink.com.httpdemo.adapter.FileListAdapter;
+import card.blink.com.httpdemo.adapter.Protocol;
 import card.blink.com.httpdemo.view.PullToRefreshListView;
 import okhttp3.Call;
 import okhttp3.MediaType;
@@ -65,6 +73,7 @@ public class MainActivity extends Activity {
     @InjectView(R.id.btn8)
     Button btn8;
 
+
     @InjectView(R.id.lv)
     PullToRefreshListView lv;
 
@@ -75,10 +84,22 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1,
-                android.R.id.text1,
-                new String[]{"item1", "item2", "item3"});
-        lv.setAdapter(adapter);
+        List<FileListAdapter.Pair<String, Integer>> list = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            FileListAdapter.Pair<String, Integer> pair = new FileListAdapter.Pair<>();
+            pair.setA("file name :" + i);
+            pair.setB(Protocol.DIR);
+            list.add(pair);
+        }
+
+        FileListAdapter fileListAdapter = new FileListAdapter(this, list);
+
+//        ArrayAdapter<String> adapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1,
+//                android.R.id.text1,
+//                new String[]{"item1", "item2", "item3"});
+        lv.setAdapter(fileListAdapter);
+
+
         lv.setonRefreshListener(new PullToRefreshListView.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -90,25 +111,45 @@ public class MainActivity extends Activity {
 
     }
 
+    private String getTime(long millis) {
+        Date date = new Date(millis*1000L);
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        formatter.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+        String dateFormatted = formatter.format(date);
+
+        return dateFormatted;
+    }
+
+
+    public void btn9() {
+        Log.v(TAG,"btn9");
+
+        long t = 1490710497;
+        String time = getTime(t);
+        Log.v(TAG,"t===" + t + "---time===" + time);
+
+    }
+
     /**
      * 测试上传大文件
      */
     @OnClick(R.id.btn8)
     public void uploadBigFile() {
-        Log.v(TAG, "上传大文件");
-        final File file = new File(Environment.getExternalStorageDirectory().toString(), "jd.rar");
-        String fileAbsolutePath = file.getAbsolutePath();
-        Log.i(TAG, "fileAbsolutePath==" + fileAbsolutePath);
-        long length = file.length();
-        Log.i(TAG, "length==" + length);
+//        Log.v(TAG, "上传大文件");
+//        final File file = new File(Environment.getExternalStorageDirectory().toString(), "jd.rar");
+//        String fileAbsolutePath = file.getAbsolutePath();
+//        Log.i(TAG, "fileAbsolutePath==" + fileAbsolutePath);
+//        long length = file.length();
+//        Log.i(TAG, "length==" + length);
+//
+//        new Thread() {
+//            @Override
+//            public void run() {
+//                postUploadBigFileRequest(file);
+//            }
+//        }.start();
 
-        new Thread() {
-            @Override
-            public void run() {
-                postUploadBigFileRequest(file);
-            }
-        }.start();
-
+        btn9();
 
     }
 

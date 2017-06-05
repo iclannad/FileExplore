@@ -19,55 +19,39 @@
         android:orientation="vertical">
 
         <TextView
+            android:layout_weight="1"
             android:id="@+id/text_view_list_item"
-            android:layout_width="match_parent"
+            android:layout_width="200dp"
             android:layout_height="0dp"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="10dp"
-            android:layout_weight="1"
             android:gravity="center_vertical"
-            android:lines="1"
-            android:textColor="@color/Greyer" />
+            android:textColor="@android:color/darker_gray" />
 
         <LinearLayout
-            android:id="@+id/ll"
+            android:layout_weight="1"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="3dp"
-            android:layout_weight="1"
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/tv_file_alter_time"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="大小"
-                android:textColor="@android:color/darker_gray"
-                android:textSize="10sp" />
+                android:textColor="@android:color/darker_gray" />
 
-            <RelativeLayout
+            <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1">
-
-                <TextView
-                    android:layout_alignParentRight="true"
-                    android:layout_marginRight="10dp"
-                    android:id="@+id/tv_file_size"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text="修改日期"
-                    android:textColor="@android:color/darker_gray"
-                    android:textSize="10sp" />
-
-            </RelativeLayout>
-
-
+                android:layout_weight="1"
+                android:text="修改日期"
+                android:textColor="@android:color/darker_gray" />
         </LinearLayout>
 
     </LinearLayout>
+
 
 </LinearLayout>

@@ -7,9 +7,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 import card.blink.com.fileexplore.adapter.FileListAdapter;
 import card.blink.com.fileexplore.adapter.Protocol;
@@ -182,5 +186,19 @@ public class Tools {
             return null;
         }
     }
+
+    /**
+     * linux时间转换
+     * @param millis
+     * @return
+     */
+    public static String getTime(long millis) {
+        Date date = new Date(millis*1000L);
+        DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        formatter.setTimeZone(TimeZone.getTimeZone("GMT+8"));
+        String dateFormatted = formatter.format(date);
+        return dateFormatted;
+    }
+
 
 }
