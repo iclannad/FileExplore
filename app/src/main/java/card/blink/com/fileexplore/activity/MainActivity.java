@@ -351,8 +351,11 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                     playOnlineFile(urlDownload);
 
                 } else {
+                    // 开始服务
+                    Log.v(TAG, "开启下载的服务");
                     Log.i(TAG, "直接下载文件");
                     downloadFile(urlDownload);
+
                 }
 
                 break;
