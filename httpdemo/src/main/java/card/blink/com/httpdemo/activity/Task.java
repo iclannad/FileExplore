@@ -5,6 +5,6 @@ package card.blink.com.httpdemo.activity;
  */
 public class Task {
     public String name;
-    public String progress;
+    public String progress = "0";
 }
 

@@ -23,6 +23,7 @@ import com.gc.materialdesign.widgets.ProgressDialog;
 import com.google.gson.Gson;
 import com.google.gson.internal.bind.CollectionTypeAdapterFactory;
 import com.zhy.http.okhttp.OkHttpUtils;
+import com.zhy.http.okhttp.callback.Callback;
 import com.zhy.http.okhttp.callback.FileCallBack;
 import com.zhy.http.okhttp.callback.StringCallback;
 
@@ -55,7 +56,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-public class MainActivity extends Activity{
+public class MainActivity extends Activity {
 
     boolean mBound = false;
 
@@ -102,8 +103,6 @@ public class MainActivity extends Activity{
 
 
     DownloadingService mService;
-
-
 
 
     @Override
@@ -164,8 +163,8 @@ public class MainActivity extends Activity{
 
     @OnClick(R.id.btn13)
     public void btn13() {
-        Log.v(TAG,"btn13");
-        Log.v(TAG,"跳转到传输界面");
+        Log.v(TAG, "btn13");
+        Log.v(TAG, "跳转到传输界面");
 
         startActivity(new Intent(this, TransportActivity.class));
     }
@@ -182,7 +181,9 @@ public class MainActivity extends Activity{
 
     }
 
-    /** Defines callbacks for service binding, passed to bindService() */
+    /**
+     * Defines callbacks for service binding, passed to bindService()
+     */
     private ServiceConnection mConnection = new ServiceConnection() {
 
         @Override
@@ -205,7 +206,6 @@ public class MainActivity extends Activity{
         startService(new Intent(this, DownloadingService.class));
 
     }
-
 
 
     // 会卡死手机 测试手机：小米max
@@ -273,23 +273,24 @@ public class MainActivity extends Activity{
      */
     @OnClick(R.id.btn8)
     public void uploadBigFile() {
-//        Log.v(TAG, "上传大文件");
-//        final File file = new File(Environment.getExternalStorageDirectory().toString(), "jd.rar");
-//        String fileAbsolutePath = file.getAbsolutePath();
-//        Log.i(TAG, "fileAbsolutePath==" + fileAbsolutePath);
-//        long length = file.length();
-//        Log.i(TAG, "length==" + length);
-//
-//        new Thread() {
-//            @Override
-//            public void run() {
-//                postUploadBigFileRequest(file);
-//            }
-//        }.start();
+        Log.v(TAG, "上传大文件");
+        final File file = new File(Environment.getExternalStorageDirectory().toString(), "jd.rar");
+        String fileAbsolutePath = file.getAbsolutePath();
+        Log.i(TAG, "fileAbsolutePath==" + fileAbsolutePath);
+        long length = file.length();
+        Log.i(TAG, "length==" + length);
+
+        new Thread() {
+            @Override
+            public void run() {
+                postUploadBigFileRequest(file);
+            }
+        }.start();
+        //postUploadBigFileRequest(file);
 
         //btn9();
         //btn10();
-        btn11();
+        //btn11();
 
     }
 
@@ -324,7 +325,6 @@ public class MainActivity extends Activity{
 
         }
 
-
     }
 
 
@@ -349,6 +349,9 @@ public class MainActivity extends Activity{
         try {
             Response response = client.newCall(request).execute();
             Log.i(TAG, "response==" + response.toString());
+            int code = response.code();
+            Log.d(TAG, "code===" + code);
+
             ResponseBody responseBody = response.body();
             Log.i(TAG, "responseBody==" + responseBody.toString());
             String string = responseBody.string();
@@ -367,7 +370,7 @@ public class MainActivity extends Activity{
         // empty
         byte[] postmsg = new byte[280];
 
-        String path = "/mount1/myjd4.rar";
+        String path = "/sdd1/mytest/8.rar";
         byte[] pathBytes = path.getBytes();
         // 填充路径
         for (int i = 0; i < pathBytes.length; i++) {
@@ -641,7 +644,7 @@ public class MainActivity extends Activity{
     public void playOnline() {
         Log.i(TAG, "btn6");
         Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
-        Uri data = Uri.parse("http://192.168.16.1:8080/media/mount1/Aegean_Sea.mp4");
+        Uri data = Uri.parse("http://192.168.16.1:8080/media/sdb1/Aegean_Sea.mp4");
         intent.setDataAndType(data, "video/mp4");
         try {
             startActivity(intent);
@@ -653,7 +656,7 @@ public class MainActivity extends Activity{
     @OnClick(R.id.btn5)
     public void btn5Dl() {
         Log.i(TAG, "btn5");
-        String url = "http://192.168.16.1:8080/media/mount1/jd.rar";
+        String url = "http://192.168.16.1:8080/media/sdc1/jd.rar";
         OkHttpUtils//
                 .get()//
                 .url(url)//
@@ -663,7 +666,23 @@ public class MainActivity extends Activity{
 
                     @Override
                     public void onError(Call call, Exception e, int id) {
+                        Log.v(TAG, "id===" + id);
                         Log.e(TAG, "onError");
+                        String error = e.toString();
+                        Log.d(TAG, "error===" + error);
+                        switch (error) {
+                            case "java.net.SocketTimeoutException":
+                                Log.e(TAG, "访问超时");
+                                break;
+                            case "java.io.IOException: request failed , reponse's code is : 404":
+                                Log.e(TAG, "请求码为404");
+                                break;
+                            case "java.net.ProtocolException: unexpected end of stream":
+                                Log.e(TAG, "下载过程中发生异常");
+                                break;
+                            default:
+                                break;
+                        }
                     }
 
                     @Override
@@ -675,6 +694,15 @@ public class MainActivity extends Activity{
                     public void inProgress(float progress, long total, int id) {
                         super.inProgress(progress, total, id);
                         Log.d(TAG, "inProgress===" + progress * 100);
+                    }
+
+                    @Override
+                    public boolean validateReponse(Response response, int id) {
+                        Log.v(TAG, "response.toString()==" + response.toString());
+                        Log.v(TAG, "response.code()==" + response.code());
+                        Log.v(TAG, "response==" + response);
+
+                        return super.validateReponse(response, id);
                     }
                 });
 
@@ -709,7 +737,7 @@ public class MainActivity extends Activity{
 //        Log.i(TAG, "getRequest");
 //        OkHttpClient client = new OkHttpClient();
 //        Request request = new Request.Builder()
-//                .url("http://192.168.16.1:8080/media/mount1/jd.rar")
+//                .url("http://192.168.16.1:8080/media/sdb1/jd.rar")
 //                .build();
 //        client.newCall(request).enqueue(new Callback() {
 //            @Override
@@ -768,11 +796,14 @@ public class MainActivity extends Activity{
 
         try {
             Response response = client.newCall(request).execute();
-            Log.i(TAG, "response==" + response.toString());
+            Log.v(TAG, "response==" + response.toString());
+            int code = response.code();
+            Log.i(TAG, "code===" + code);
+
             ResponseBody responseBody = response.body();
-            Log.i(TAG, "responseBody==" + responseBody.toString());
+            Log.v(TAG, "responseBody==" + responseBody.toString());
             String string = responseBody.string();
-            Log.i(TAG, "responseBody.string()==" + string);
+            Log.v(TAG, "responseBody.string()==" + string);
             // 获取到Json数据的内容
             String content = string;
 
@@ -780,11 +811,35 @@ public class MainActivity extends Activity{
             Data data = gson.fromJson(content, Data.class);
             Log.d(TAG, data.toString());
             int result = data.result;
-            Log.i(TAG, result + "");
+            Log.v(TAG, result + "");
+            switch (result) {
+                case 0:
+                    Log.d(TAG, "正确请求");
+                    break;
+                case 1:
+                    Log.d(TAG, "请求出错");
+                    break;
+                case 2:
+                    Log.d(TAG, "无磁盘");
+                    break;
+                case 3:
+                    Log.d(TAG, "请求type出错");
+                    break;
+                case 4:
+                    Log.d(TAG, "请求路径异常");
+                    break;
+                default:
+                    Log.d(TAG, "default");
+                    break;
+            }
 
 
         } catch (IOException e) {
             e.printStackTrace();
+            Log.v(TAG, e.toString());
+            if (e.toString().equals("java.net.SocketTimeoutException")) {
+                Log.i(TAG, "访问链接超时");
+            }
         }
     }
 
