@@ -157,9 +157,10 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
         if (folders == null && documents == null) {
             if (disks != null) {
                 for (int i = 0; i < disks.length; i++) {
+                    FileListData.Disk disk = disks[i];
+                    Log.i(TAG, "disk.free==" + disk.free);
                     FileListAdapter.Pair<String, Integer> pair = new FileListAdapter.Pair<>();
                     pair.setB(Protocol.PAN);
-                    FileListData.Disk disk = disks[i];
                     String name = disk.name;
                     pair.setA(name);
                     list.add(pair);
@@ -379,9 +380,16 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
         url = Comment.HOST + url;
         Log.e(TAG, "downloadFile url===" + url);
 
-        Intent intent = new Intent(android.content.Intent.ACTION_VIEW);
+        Intent intent = new Intent();
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setAction(Intent.ACTION_VIEW);
+
+//        String link = "rtsp://" + url;
+//        Log.e(TAG, "link===" + link);
+        //Uri data = Uri.parse(link);
+
         Uri data = Uri.parse(url);
-        intent.setDataAndType(data, "video/mp4");
+        intent.setDataAndType(data, "video/*");
         try {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
