@@ -30,7 +30,9 @@ import butterknife.InjectView;
 import card.blink.com.fileexplore.R;
 import card.blink.com.fileexplore.adapter.FileListAdapter;
 import card.blink.com.fileexplore.adapter.Protocol;
+import card.blink.com.fileexplore.bean.Task;
 import card.blink.com.fileexplore.gson.FileListData;
+import card.blink.com.fileexplore.service.FileTransportService;
 import card.blink.com.fileexplore.tools.Comment;
 import card.blink.com.fileexplore.tools.Tools;
 import card.blink.com.fileexplore.view.MyProgressDIalog;
@@ -354,7 +356,14 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                 } else {
                     // 开始服务
                     Log.v(TAG, "开启下载的服务");
-                    Log.i(TAG, "直接下载文件");
+                    Log.i(TAG, "添加任务到任务列表");
+//                    Task task = new Task();
+//                    task.name = name;
+//                    task.url = Comment.HOST + urlDownload;
+//                    task.status = Comment.BEFORE;
+//                    Comment.TASK_ARRAY_LIST.add(task);
+//
+//                    startService(new Intent(this, FileTransportService.class));
                     downloadFile(urlDownload);
 
                 }
@@ -389,6 +398,7 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
         //Uri data = Uri.parse(link);
 
         Uri data = Uri.parse(url);
+
         intent.setDataAndType(data, "video/*");
         try {
             startActivity(intent);

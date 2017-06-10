@@ -24,6 +24,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.ChooseUploadFileActivity" />
+
+        <service android:name=".service.FileTransportService" />
     </application>
 
 </manifest>

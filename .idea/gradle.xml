@@ -11,18 +11,14 @@
             <option value="$PROJECT_DIR$/UI_SDK" />
             <option value="$PROJECT_DIR$/Widgets" />
             <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/filetransportdemo" />
             <option value="$PROJECT_DIR$/httpdemo" />
+            <option value="$PROJECT_DIR$/okgo" />
+            <option value="$PROJECT_DIR$/okrx" />
+            <option value="$PROJECT_DIR$/okserver" />
           </set>
         </option>
-        <option name="myModules">
-          <set>
-            <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/UI_SDK" />
-            <option value="$PROJECT_DIR$/Widgets" />
-            <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/httpdemo" />
-          </set>
-        </option>
+        <option name="resolveModulePerSourceSet" value="false" />
       </GradleProjectSettings>
     </option>
   </component>

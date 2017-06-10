@@ -96,6 +96,9 @@ public class MainActivity extends Activity {
     @InjectView(R.id.btn13)
     Button btn13;
 
+    @InjectView(R.id.btn14)
+    Button btn14;
+
 //    @InjectView(R.id.tv)
 //    TextView tv;
 
@@ -159,6 +162,16 @@ public class MainActivity extends Activity {
         String dateFormatted = formatter.format(date);
 
         return dateFormatted;
+    }
+
+
+    @OnClick(R.id.btn14)
+    public void btn14() {
+        Log.v(TAG, "btn14");
+        String url = "Eureka Seven";
+        String content = Uri.encode(url);
+        Log.v(TAG, "content===" + content + "");
+
     }
 
     @OnClick(R.id.btn13)
@@ -360,6 +373,8 @@ public class MainActivity extends Activity {
 
         } catch (IOException e) {
             e.printStackTrace();
+            String error = e.toString();
+            Log.e(TAG, "error===" + error);
         }
 
     }
@@ -370,7 +385,7 @@ public class MainActivity extends Activity {
         // empty
         byte[] postmsg = new byte[280];
 
-        String path = "/sdd1/mytest/8.rar";
+        String path = "/sdb1/mytest/1.rar";
         byte[] pathBytes = path.getBytes();
         // 填充路径
         for (int i = 0; i < pathBytes.length; i++) {
@@ -416,7 +431,6 @@ public class MainActivity extends Activity {
             content[i] = i < postmsg.length ? postmsg[i] : fSize[i - postmsg.length];
         }
         Log.i(TAG, "content===" + Arrays.toString(content));
-
 
         return content;
     }
@@ -543,7 +557,6 @@ public class MainActivity extends Activity {
             Log.i(TAG, "responseBody==" + responseBody.toString());
             String string = responseBody.string();
             Log.i(TAG, "responseBody.string()==" + string);
-
 
         } catch (IOException e) {
             e.printStackTrace();
