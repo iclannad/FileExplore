@@ -2,6 +2,7 @@ package com.lzy.okserver.download;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.util.Log;
 
 import com.lzy.okgo.request.BaseRequest;
 import com.lzy.okgo.utils.OkLogger;
@@ -25,6 +26,8 @@ import java.io.Serializable;
  * ================================================
  */
 public class DownloadInfo implements Comparable<DownloadInfo> {
+
+    public static final String TAG = DownloadInfo.class.getSimpleName();
 
     //表中的字段
     public static final String ID = "_id";
@@ -319,7 +322,9 @@ public class DownloadInfo implements Comparable<DownloadInfo> {
         this.data = data;
     }
 
-    /** taskKey 相同就认为是同一个任务 */
+    /**
+     * taskKey 相同就认为是同一个任务
+     */
     @Override
     public boolean equals(Object o) {
         if (o != null && o instanceof DownloadInfo) {
@@ -329,7 +334,9 @@ public class DownloadInfo implements Comparable<DownloadInfo> {
         return false;
     }
 
-    /** 两个任务排序按照 id 的大小排序 */
+    /**
+     * 两个任务排序按照 id 的大小排序
+     */
     @Override
     public int compareTo(DownloadInfo another) {
         if (another == null) return 0;

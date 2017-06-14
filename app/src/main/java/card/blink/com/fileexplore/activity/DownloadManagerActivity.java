@@ -1,7 +1,7 @@
-package card.blink.com.filetransportdemo.activity;
+package card.blink.com.fileexplore.activity;
 
-import android.nfc.Tag;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.Toolbar;
 import android.text.format.Formatter;
 import android.util.Log;
@@ -25,31 +25,65 @@ import java.io.File;
 import java.util.List;
 
 import butterknife.Bind;
-import card.blink.com.filetransportdemo.R;
-import card.blink.com.filetransportdemo.base.BaseActivity;
-import card.blink.com.filetransportdemo.model.ApkModel;
-import card.blink.com.filetransportdemo.ui.NumberProgressBar;
-import card.blink.com.filetransportdemo.utils.ApkUtils;
+
+import card.blink.com.fileexplore.R;
+import card.blink.com.fileexplore.activity.base.UploadAndDownloadBaseActivity;
+import card.blink.com.fileexplore.model.ApkModel;
+import card.blink.com.fileexplore.tools.ApkUtils;
+import card.blink.com.fileexplore.view.NumberProgressBar;
+
 
 /**
- * Created by Administrator on 2017/6/10.
+ * Created by Administrator on 2017/6/12.
  */
 
-public class DownloadManagerActivity extends BaseActivity implements View.OnClickListener, ExecutorWithListener.OnAllTaskEndListener {
+public class DownloadManagerActivity extends UploadAndDownloadBaseActivity implements View.OnClickListener, ExecutorWithListener.OnAllTaskEndListener {
+
 
     private static final String TAG = DownloadManagerActivity.class.getSimpleName();
     private List<DownloadInfo> allTask;
     private MyAdapter adapter;
     private DownloadManager downloadManager;
 
-    @Bind(R.id.toolbar)
-    Toolbar toolbar;
     @Bind(R.id.listView)
     ListView listView;
 
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
+
+
+//    /**
+//     * Start()
+//     */
+//    @Override
+//    public void init() {
+//        View view = LayoutInflater.from(context).inflate(R.layout.activity_download_manager, null);
+//        ButterKnife.bind(this, view);
+//
+//        setContent(view);
+//
+//        setTitle("下载管理");
+//        setLeftTitle("返回");
+//        setRightTitleVisiable(false);
+//        setLeftTitleColor(R.color.White);
+//        setRightTitleColor(R.color.White);
+//        setTopTitleColor(R.color.White);
+//        setTopColor(R.color.MainColorBlue);
+//
+//        downloadManager = DownloadService.getDownloadManager();
+//        allTask = downloadManager.getAllTask();
+//        adapter = new MyAdapter();
+//        listView.setAdapter(adapter);
+//
+//        downloadManager.getThreadPool().getExecutor().addOnAllTaskEndListener(this);
+//
+//    }
+
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_download_manager);
         initToolBar(toolbar, true, "下载管理");
 
@@ -60,6 +94,17 @@ public class DownloadManagerActivity extends BaseActivity implements View.OnClic
 
         downloadManager.getThreadPool().getExecutor().addOnAllTaskEndListener(this);
     }
+
+//    /**
+//     * 左边的点击事件重写
+//     */
+//    @Override
+//    public void setLeftCLick() {
+//        Log.v(TAG, "setLeftCLick");
+//        super.setLeftCLick();
+//
+//    }
+
 
     @Override
     public void onAllTaskEnd() {
@@ -85,23 +130,47 @@ public class DownloadManagerActivity extends BaseActivity implements View.OnClic
         adapter.notifyDataSetChanged();
     }
 
-    public void onClick(View v) {
+    /**
+     * 点击事件就是在这个方法里面实现
+     * 这个点击事件是单击 不包括 item点击 长按 等等
+     *
+     * @param v
+     */
+    //@Override
+    public void Click(View v) {
+        Log.v(TAG, "---Click");
+        //super.Click(v);
         switch (v.getId()) {
             case R.id.removeAll:
+                Log.v(TAG, "removeAll");
                 downloadManager.removeAllTask();
                 adapter.notifyDataSetChanged();  //移除的时候需要调用
                 break;
             case R.id.pauseAll:
+                Log.v(TAG, "pauseAll");
                 downloadManager.pauseAllTask();
                 break;
             case R.id.stopAll:
+                Log.v(TAG, "stopAll");
                 downloadManager.stopAllTask();
                 break;
             case R.id.startAll:
+                Log.v(TAG, "startAll");
                 downloadManager.startAllTask();
                 break;
         }
     }
+
+    /**
+     * Called when a view has been clicked.
+     *
+     * @param v The view that was clicked.
+     */
+    @Override
+    public void onClick(View v) {
+        Click(v);
+    }
+
 
     private class MyAdapter extends BaseAdapter {
         @Override
@@ -121,8 +190,8 @@ public class DownloadManagerActivity extends BaseActivity implements View.OnClic
 
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
-            DownloadInfo downloadInfo = getItem(position);
-            ViewHolder holder;
+            final DownloadInfo downloadInfo = getItem(position);
+            final ViewHolder holder;
             if (convertView == null) {
                 convertView = View.inflate(DownloadManagerActivity.this, R.layout.item_download_manager, null);
                 holder = new ViewHolder(convertView);
@@ -130,7 +199,6 @@ public class DownloadManagerActivity extends BaseActivity implements View.OnClic
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
-            //Log.v(TAG,"holder.refresh(downloadInfo);");
             holder.refresh(downloadInfo);
 
             //对于非进度更新的ui放在这里，对于实时更新的进度ui，放在holder中
@@ -144,6 +212,7 @@ public class DownloadManagerActivity extends BaseActivity implements View.OnClic
             holder.download.setOnClickListener(holder);
             holder.remove.setOnClickListener(holder);
             holder.restart.setOnClickListener(holder);
+
 
             DownloadListener downloadListener = new MyDownloadListener();
             downloadListener.setUserTag(holder);
@@ -164,6 +233,7 @@ public class DownloadManagerActivity extends BaseActivity implements View.OnClic
         private Button remove;
         private Button restart;
 
+
         public ViewHolder(View convertView) {
             icon = (ImageView) convertView.findViewById(R.id.icon);
             name = (TextView) convertView.findViewById(R.id.name);
@@ -174,10 +244,13 @@ public class DownloadManagerActivity extends BaseActivity implements View.OnClic
             download = (Button) convertView.findViewById(R.id.start);
             remove = (Button) convertView.findViewById(R.id.remove);
             restart = (Button) convertView.findViewById(R.id.restart);
+
+
         }
 
         public void refresh(DownloadInfo downloadInfo) {
             this.downloadInfo = downloadInfo;
+            Log.v(TAG, "this.downloadInfo = downloadInfo;");
             refresh();
         }
 
@@ -215,12 +288,15 @@ public class DownloadManagerActivity extends BaseActivity implements View.OnClic
             int jd = (int) (Math.round(downloadInfo.getProgress() * 10000) * 1.0f / 100);
             Log.v(TAG, "jd==" + jd);
 
+
             tvProgress.setText((progress));
             int maxInt = (int) downloadInfo.getTotalLength();
             pbProgress.setMax((int) downloadInfo.getTotalLength());
             int progressInt = (int) downloadInfo.getDownloadLength();
             pbProgress.setProgress((int) downloadInfo.getDownloadLength());
             Log.v(TAG, "progressInt===" + progressInt + "---maxInt===" + maxInt);
+            //adapter.notifyDataSetChanged();
+
         }
 
         @Override
@@ -243,6 +319,7 @@ public class DownloadManagerActivity extends BaseActivity implements View.OnClic
                         }
                         break;
                 }
+                Log.v(TAG, "refresh();");
                 refresh();
             } else if (v.getId() == remove.getId()) {
                 downloadManager.removeTask(downloadInfo.getUrl());

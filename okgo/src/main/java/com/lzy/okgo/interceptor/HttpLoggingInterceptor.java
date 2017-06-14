@@ -133,14 +133,17 @@ public class HttpLoggingInterceptor implements Interceptor {
                 }
                 log(" ");
                 if (logBody && HttpHeaders.hasBody(clone)) {
-                    if (isPlaintext(responseBody.contentType())) {
-                        String body = responseBody.string();
-                        log("\tbody:" + body);
-                        responseBody = ResponseBody.create(responseBody.contentType(), body);
-                        return response.newBuilder().body(responseBody).build();
-                    } else {
-                        log("\tbody: maybe [file part] , too large too print , ignored!");
-                    }
+                    String type = responseBody.contentType().type();
+                    log(type + "");
+                    // 先注释这一部分代码，如果后面出现bug可考虑是否是这部分代码的原因
+                    //               if (isPlaintext(responseBody.contentType())) {
+//                        String body = responseBody.string();
+//                        log("\tbody:" + body);
+//                        responseBody = ResponseBody.create(responseBody.contentType(), body);
+//                        return response.newBuilder().body(responseBody).build();
+//                    } else {
+//                        log("\tbody: maybe [file part] , too large too print , ignored!");
+//                    }
                 }
             }
         } catch (Exception e) {
@@ -164,9 +167,9 @@ public class HttpLoggingInterceptor implements Interceptor {
         if (subtype != null) {
             subtype = subtype.toLowerCase();
             if (subtype.contains("x-www-form-urlencoded") ||
-                subtype.contains("json") ||
-                subtype.contains("xml") ||
-                subtype.contains("html")) //
+                    subtype.contains("json") ||
+                    subtype.contains("xml") ||
+                    subtype.contains("html")) //
                 return true;
         }
         return false;

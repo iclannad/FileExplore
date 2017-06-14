@@ -1,4 +1,4 @@
-package card.blink.com.filetransportdemo.ui;
+package card.blink.com.fileexplore.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -12,7 +12,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
-import card.blink.com.filetransportdemo.R;
+import card.blink.com.fileexplore.R;
 
 
 /**
@@ -285,7 +285,7 @@ public class NumberProgressBar extends View {
 
     private void calculateDrawRectF() {
 
-        mCurrentDrawText = String.format("%d", (long)getProgress() * 100 / getMax());
+        mCurrentDrawText = String.format("%d", (long) getProgress() * 100 / getMax());
         Log.v("tag", mCurrentDrawText);
 
         mCurrentDrawText = mPrefix + mCurrentDrawText + mSuffix;

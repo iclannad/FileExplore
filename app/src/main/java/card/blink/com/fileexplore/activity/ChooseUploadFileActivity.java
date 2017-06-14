@@ -1,14 +1,12 @@
 package card.blink.com.fileexplore.activity;
 
 import android.content.Intent;
-import android.nfc.Tag;
 import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.example.administrator.ui_sdk.MyBaseActivity.BaseActivity;
 
@@ -16,8 +14,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import card.blink.com.fileexplore.R;
 import card.blink.com.fileexplore.adapter.FileListAdapter;
 import card.blink.com.fileexplore.adapter.Protocol;
@@ -28,7 +26,7 @@ import card.blink.com.fileexplore.tools.Tools;
  */
 public class ChooseUploadFileActivity extends BaseActivity implements AdapterView.OnItemClickListener {
 
-    @InjectView(R.id.lv)
+    @Bind(R.id.lv)
     ListView lv;
 
     private static final String TAG = ChooseUploadFileActivity.class.getSimpleName();
@@ -46,7 +44,7 @@ public class ChooseUploadFileActivity extends BaseActivity implements AdapterVie
         setContent(view);
 
         // 注解框架
-        ButterKnife.inject(this, view);
+        ButterKnife.bind(this, view);
 
         setTitle("选择文件");
         setLeftTitle("上一级");

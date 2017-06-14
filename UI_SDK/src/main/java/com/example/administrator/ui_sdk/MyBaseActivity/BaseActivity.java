@@ -556,6 +556,7 @@ public abstract class BaseActivity extends FragmentActivity implements View.OnCl
 
     @Override
     public void onClick(View v) {
+        Log.v("tag", "onClick");
         if (v == base_top_text1) {
             setRightTextClick(base_top_text1);
         }
