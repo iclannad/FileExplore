@@ -203,15 +203,27 @@ public class FileTransportUtils {
             Log.v(TAG, "timeMillisAfter - timeMillisBefore===" + (timeMillisAfter - timeMillisBefore));
             uploadTask.time = (timeMillisAfter - timeMillisBefore) / 1000;
 
-            // 此处应当存数据保存至数据库中
-
             uploadTask.index = index;
             uploadTask.count = count;
 
             if (index == count && index != 0) {
+                // 回调给service
                 UploadTaskCallback callback = uploadTask.uploadTaskCallback;
                 if (callback != null) {
                     callback.finished();
+                }
+                // 更新任务的状态为完成
+                uploadTask.status = Comment.AFTER;
+            }
+
+            if (uploadTask.status == Comment.PAUSE) {
+                // 阻塞子线程
+                synchronized (uploadTask) {
+                    try {
+                        uploadTask.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
             }
 
@@ -221,13 +233,8 @@ public class FileTransportUtils {
             msg.obj = uploadTask;
             uploadTask.handler.sendMessage(msg);
 
-//            // 上传过程中
-//            if (uploadTask.uploadListener != null) {
-//                uploadTask.uploadListener.onProgress(uploadTask);
-//            }
             index++;
         }
-        // 单个任务上传结束
 
     }
 

@@ -24,6 +24,7 @@ import card.blink.com.fileexplore.R;
 import card.blink.com.fileexplore.activity.base.UploadAndDownloadBaseActivity;
 import card.blink.com.fileexplore.model.UploadTask;
 import card.blink.com.fileexplore.service.UploadService;
+import card.blink.com.fileexplore.tools.Comment;
 import card.blink.com.fileexplore.upload.UploadListener;
 import card.blink.com.fileexplore.upload.UploadManager;
 import card.blink.com.fileexplore.view.NumberProgressBar;
@@ -130,7 +131,6 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
             // 条目的按钮的点击事件
             holder.upload.setOnClickListener(holder);
             holder.remove.setOnClickListener(holder);
-            holder.restart.setOnClickListener(holder);
 
             UploadListener uploadListener = new MyUploadListener();
             uploadListener.setUserTag(holder);
@@ -151,7 +151,7 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
         private NumberProgressBar pbProgress;
         private Button upload;
         private Button remove;
-        private Button restart;
+
 
         public ViewHolder(View convertView) {
             icon = (ImageView) convertView.findViewById(R.id.icon);
@@ -162,7 +162,7 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
             pbProgress = (NumberProgressBar) convertView.findViewById(R.id.pbProgress);
             upload = (Button) convertView.findViewById(R.id.start);
             remove = (Button) convertView.findViewById(R.id.remove);
-            restart = (Button) convertView.findViewById(R.id.restart);
+
         }
 
         public void refresh(UploadTask uploadTask) {
@@ -171,6 +171,12 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
         }
 
         private void refresh() {
+            if (uploadTask.status == Comment.RUNNING) {
+                upload.setText("暂停");
+            } else {
+                upload.setText("上传");
+            }
+
             Log.v(TAG, "refresh");
             float progress = uploadTask.index * 1.0f / uploadTask.count;
             String jd = (Math.round(progress * 10000) * 1.0f / 100) + "%";
@@ -179,23 +185,19 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
             pbProgress.setMax((int) uploadTask.count);
             pbProgress.setProgress((int) uploadTask.index);
 
-
             String fileSize = "0M";
             if (uploadTask.fileSize != 0) {
                 fileSize = Formatter.formatFileSize(UploadManagerActivity.this, uploadTask.fileSize);
             }
             Log.v(TAG, "fileSize===" + fileSize);
-
             String uploaded = "--M/--M";
             String netspeed = "---K/s";
 
             if (uploadTask.index == uploadTask.count && uploadTask.index != 0) {
                 uploaded = fileSize + "/" + fileSize;
-
                 netspeed = "上传完成";
             } else {
                 uploaded = uploadTask.index * 5 + "M/" + fileSize;
-
                 long speed;
                 try {
                     speed = (5 * 1024 * 1024) / uploadTask.time;
@@ -208,7 +210,11 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
             Log.v(TAG, "uploaded===" + uploaded);
             uploadSize.setText(uploaded);
             Log.v(TAG, "netspeed===" + netspeed);
-            netSpeed.setText(netspeed);
+            if (uploadTask.status == Comment.PAUSE) {
+                netSpeed.setText("暂停中");
+            } else {
+                netSpeed.setText(netspeed);
+            }
 
         }
 
@@ -216,12 +222,24 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
         public void onClick(View v) {
             if (v.getId() == upload.getId()) {
                 Log.v(TAG, "upload");
+                if (uploadTask.status != Comment.PAUSE) {
+                    uploadTask.status = Comment.PAUSE;
+                    upload.setText("下载");
+                    netSpeed.setText("暂停中");
+                } else {
+                    uploadTask.status = Comment.RUNNING;
+                    upload.setText("暂停");
+
+                    // 唤醒子线程
+                    synchronized (uploadTask) {
+                        uploadTask.notify();
+                    }
+
+                }
+                //upload.setText("下载");
 
             } else if (v.getId() == remove.getId()) {
                 Log.v(TAG, "remove");
-
-            } else if (v.getId() == restart.getId()) {
-                Log.v(TAG, "restart");
 
             }
         }

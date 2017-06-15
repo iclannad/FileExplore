@@ -97,14 +97,14 @@
         android:text="删除"
         android:textColor="#FFF" />
 
-    <Button
-        android:id="@+id/restart"
-        android:layout_width="40dp"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:background="#03E"
-        android:padding="5dp"
-        android:text="重新\n上传"
-        android:textColor="#FFF" />
+    <!--<Button-->
+        <!--android:id="@+id/restart"-->
+        <!--android:layout_width="40dp"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_gravity="center"-->
+        <!--android:background="#03E"-->
+        <!--android:padding="5dp"-->
+        <!--android:text="重新\n上传"-->
+        <!--android:textColor="#FFF" />-->
 
 </LinearLayout>

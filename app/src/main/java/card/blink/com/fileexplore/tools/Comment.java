@@ -18,11 +18,12 @@ public class Comment {
     public final static int BEFORE = 0;
     public final static int RUNNING = 1;
     public final static int AFTER = 2;
+    public final static int PAUSE = 3;
 
     public static final int ERROR = -1;
     public static final int SUCCESS = 1;
-    public static final int UPLOAD_SUCCESS = 2;
-    public static final int UPLOADING = 3;
+    public static final int UPLOAD_SUCCESS = 3;
+    public static final int UPLOADING = 4;
 
 
 }
