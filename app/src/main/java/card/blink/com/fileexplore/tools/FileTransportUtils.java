@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.util.Arrays;
 
 import card.blink.com.fileexplore.gson.FileListData;
+import card.blink.com.fileexplore.model.UploadTask;
 import card.blink.com.fileexplore.service.UploadTaskCallback;
 import okhttp3.Call;
 import okhttp3.MediaType;
@@ -156,27 +157,26 @@ public class FileTransportUtils {
 
     /**
      * 将手机中的文件上传至u盘中, 在子线程中传输
-     *  @param path
-     * @param uploadPath
-     * @param
      */
-    public static void uploadFileToExternalStorage(String path, final String uploadPath, final Handler handler, final UploadTaskCallback uploadTaskCallback) {
-        final File file = new File(path);
+    public static void uploadFileToExternalStorage(final UploadTask uploadTask) {
+        final File file = new File(uploadTask.fromUrl);
+        uploadTask.fileSize = file.length();
+        Log.v(TAG, "fileSize==" + uploadTask.fileSize);
         new Thread() {
             @Override
             public void run() {
-                postUploadFileRequest(file, uploadPath, handler,uploadTaskCallback);
+                postUploadFileRequest(file, uploadTask);
             }
         }.start();
     }
 
     /**
      * 发生上传文件的请求
-     *  @param file
-     * @param uploadPath
-     * @param uploadTaskCallback
+     *
+     * @param file
+     * @param file, String uploadPath, Handler handler
      */
-    private static void postUploadFileRequest(File file, String uploadPath, Handler handler, UploadTaskCallback uploadTaskCallback) {
+    private static void postUploadFileRequest(File file, UploadTask uploadTask) {
         final int SIZE = 5 * 1024 * 1024;
         long length = file.length();
         long count = length / SIZE;
@@ -187,23 +187,47 @@ public class FileTransportUtils {
             count++;
         }
         Log.v(TAG, "需要分割成的块数是 count===" + count);
-        uploadTaskCallback.start();
 
         int index = 1;
         while (index <= count) {
             // 请求上传index块
-            uploading(file, index, count, uploadPath, handler);
+            long timeMillisBefore = System.currentTimeMillis();
+            uploading(file, index, count, uploadTask.toUrl, uploadTask.handler);
             try {
                 Thread.sleep(20);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            // 上传过程中
-            uploadTaskCallback.uploading(index, (int) count);
+            long timeMillisAfter = System.currentTimeMillis();
+
+            Log.v(TAG, "timeMillisAfter - timeMillisBefore===" + (timeMillisAfter - timeMillisBefore));
+            uploadTask.time = (timeMillisAfter - timeMillisBefore) / 1000;
+
+            // 此处应当存数据保存至数据库中
+
+            uploadTask.index = index;
+            uploadTask.count = count;
+
+            if (index == count && index != 0) {
+                UploadTaskCallback callback = uploadTask.uploadTaskCallback;
+                if (callback != null) {
+                    callback.finished();
+                }
+            }
+
+            // 发信号到主线程
+            Message msg = Message.obtain();
+            msg.what = Comment.UPLOADING;
+            msg.obj = uploadTask;
+            uploadTask.handler.sendMessage(msg);
+
+//            // 上传过程中
+//            if (uploadTask.uploadListener != null) {
+//                uploadTask.uploadListener.onProgress(uploadTask);
+//            }
             index++;
         }
         // 单个任务上传结束
-        uploadTaskCallback.finished();
 
     }
 

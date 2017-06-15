@@ -31,6 +31,7 @@ import card.blink.com.fileexplore.model.UploadTask;
 import card.blink.com.fileexplore.service.UploadService;
 import card.blink.com.fileexplore.tools.Comment;
 import card.blink.com.fileexplore.tools.FileTransportUtils;
+import card.blink.com.fileexplore.upload.UploadManager;
 import card.blink.com.fileexplore.view.MyProgressDIalog;
 import card.blink.com.fileexplore.view.PullToRefreshListView;
 
@@ -72,6 +73,14 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                     Log.i(TAG, "上传文件成功");
                     String fileName = (String) msg.obj;
                     Toast.makeText(MainActivity.this, "文件：" + fileName + "上传成功", Toast.LENGTH_SHORT).show();
+                    break;
+                case Comment.UPLOADING:
+                    Log.v(TAG, "任务上传的过程中");
+                    UploadTask uploadTask = (UploadTask) msg.obj;
+                    if (uploadTask.uploadListener != null) {
+                        Log.v(TAG, "我现在在主线程");
+                        uploadTask.uploadListener.onProgress(uploadTask);
+                    }
                     break;
                 default:
 
@@ -352,7 +361,8 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
             uploadTask.fromUrl = path;
             uploadTask.toUrl = uploadPath;
             uploadTask.handler = handler;
-            Comment.TASK_ARRAY_LIST.add(uploadTask);
+            //Comment.TASK_ARRAY_LIST.add(uploadTask);
+            UploadManager.getInstance().addTask(uploadTask);
             startService(new Intent(this, UploadService.class));
         }
 

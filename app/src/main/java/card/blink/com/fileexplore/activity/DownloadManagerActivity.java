@@ -213,7 +213,6 @@ public class DownloadManagerActivity extends UploadAndDownloadBaseActivity imple
             holder.remove.setOnClickListener(holder);
             holder.restart.setOnClickListener(holder);
 
-
             DownloadListener downloadListener = new MyDownloadListener();
             downloadListener.setUserTag(holder);
             downloadInfo.setListener(downloadListener);
@@ -244,7 +243,6 @@ public class DownloadManagerActivity extends UploadAndDownloadBaseActivity imple
             download = (Button) convertView.findViewById(R.id.start);
             remove = (Button) convertView.findViewById(R.id.remove);
             restart = (Button) convertView.findViewById(R.id.restart);
-
 
         }
 

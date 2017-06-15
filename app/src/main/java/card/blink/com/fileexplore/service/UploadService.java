@@ -22,7 +22,7 @@ import card.blink.com.fileexplore.upload.UploadManager;
 /**
  * 作用：文件传输的服务，可以在后台下载或者上传文件
  */
-public class UploadService extends Service implements UploadTaskCallback {
+public class UploadService extends Service implements UploadTaskCallback{
 
 
     private static final String TAG = UploadService.class.getSimpleName();
@@ -35,8 +35,8 @@ public class UploadService extends Service implements UploadTaskCallback {
      */
     public static UploadManager getUploadManager() {
         Context context = OkGo.getContext();
-        if (!UploadService.isServiceRunning(context))
-            context.startService(new Intent(context, UploadService.class));
+//        if (!UploadService.isServiceRunning(context))
+//            context.startService(new Intent(context, UploadService.class));
         if (UploadService.UPLOAD_MANAGER == null)
             UploadService.UPLOAD_MANAGER = UploadManager.getInstance();
         return UPLOAD_MANAGER;
@@ -63,12 +63,14 @@ public class UploadService extends Service implements UploadTaskCallback {
             if (uploadTask.status == Comment.BEFORE) {
                 Log.v(TAG, "有任务需要开始 task: " + uploadTask.name);
                 uploadTask.status = Comment.RUNNING;
-                FileTransportUtils.uploadFileToExternalStorage(uploadTask.fromUrl, uploadTask.toUrl, uploadTask.handler, this);
+                uploadTask.uploadTaskCallback = this;
+                //FileTransportUtils.uploadFileToExternalStorage(uploadTask.fromUrl, uploadTask.toUrl, uploadTask.handler);
+                FileTransportUtils.uploadFileToExternalStorage(uploadTask);
                 return;
             }
         }
         Log.v(TAG, "所有等待中的任务都开启完毕，此时可以关闭服务和清空任和列表");
-        Comment.TASK_ARRAY_LIST.clear();
+        //UploadManager.getInstance().clearAllTask();
         stopSelf();
     }
 
@@ -77,7 +79,6 @@ public class UploadService extends Service implements UploadTaskCallback {
         super.onCreate();
         Log.v(TAG, "onCreate");
         startTask();
-
     }
 
     @Override
@@ -108,7 +109,7 @@ public class UploadService extends Service implements UploadTaskCallback {
      */
     @Override
     public void start() {
-        Log.v(TAG, "任务上传前");
+
     }
 
     /**
@@ -119,8 +120,6 @@ public class UploadService extends Service implements UploadTaskCallback {
      */
     @Override
     public void uploading(int index, int total) {
-        Log.v(TAG, "index==" + index + "---total==" + total);
-
 
     }
 
@@ -129,7 +128,6 @@ public class UploadService extends Service implements UploadTaskCallback {
      */
     @Override
     public void finished() {
-        Log.v(TAG, "任务上传结束后，判断是否有任务需要开启");
         startTask();
     }
 }

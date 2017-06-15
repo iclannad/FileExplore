@@ -2,6 +2,7 @@ package card.blink.com.fileexplore.activity;
 
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.text.format.Formatter;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,13 +12,22 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.lzy.okserver.upload.UploadInfo;
+
+import java.io.IOError;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+
 import butterknife.Bind;
 import butterknife.OnClick;
 import card.blink.com.fileexplore.R;
 import card.blink.com.fileexplore.activity.base.UploadAndDownloadBaseActivity;
+import card.blink.com.fileexplore.model.UploadTask;
 import card.blink.com.fileexplore.service.UploadService;
+import card.blink.com.fileexplore.upload.UploadListener;
 import card.blink.com.fileexplore.upload.UploadManager;
 import card.blink.com.fileexplore.view.NumberProgressBar;
+import okhttp3.Response;
 
 /**
  * Created by Administrator on 2017/6/13.
@@ -26,7 +36,7 @@ import card.blink.com.fileexplore.view.NumberProgressBar;
 public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
 
     private static final String TAG = UploadManagerActivity.class.getSimpleName();
-
+    private List<UploadTask> allTask;
     private MyAdapter adapter;
     private UploadManager uploadManager;
 
@@ -43,7 +53,7 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
         initToolBar(toolbar, true, "上传管理");
 
         uploadManager = UploadService.getUploadManager();
-
+        allTask = uploadManager.getAllTask();
         adapter = new MyAdapter();
         listView.setAdapter(adapter);
 
@@ -84,32 +94,27 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
 
     private class MyAdapter extends BaseAdapter {
 
-
         @Override
         public int getCount() {
-
-            return 5;
+            return allTask.size();
 
         }
 
-
         @Override
-        public Object getItem(int position) {
-
-            return null;
+        public UploadTask getItem(int position) {
+            return allTask.get(position);
         }
 
 
         @Override
         public long getItemId(int position) {
-
-            return 0;
+            return position;
         }
 
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-
+            UploadTask uploadTask = getItem(position);
             ViewHolder holder;
             if (convertView == null) {
                 convertView = View.inflate(UploadManagerActivity.this, R.layout.item_upload_manager, null);
@@ -118,8 +123,18 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
             } else {
                 holder = (ViewHolder) convertView.getTag();
             }
+            holder.name.setText(uploadTask.name);
 
+            holder.refresh(uploadTask);
 
+            // 条目的按钮的点击事件
+            holder.upload.setOnClickListener(holder);
+            holder.remove.setOnClickListener(holder);
+            holder.restart.setOnClickListener(holder);
+
+            UploadListener uploadListener = new MyUploadListener();
+            uploadListener.setUserTag(holder);
+            uploadTask.uploadListener = uploadListener;
             return convertView;
         }
     }
@@ -127,37 +142,105 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
 
     private class ViewHolder implements View.OnClickListener {
 
+        private UploadTask uploadTask;
         private ImageView icon;
         private TextView name;
-        private TextView downloadSize;
+        private TextView uploadSize;
         private TextView tvProgress;
         private TextView netSpeed;
         private NumberProgressBar pbProgress;
-        private Button download;
+        private Button upload;
         private Button remove;
         private Button restart;
 
         public ViewHolder(View convertView) {
             icon = (ImageView) convertView.findViewById(R.id.icon);
             name = (TextView) convertView.findViewById(R.id.name);
-            downloadSize = (TextView) convertView.findViewById(R.id.downloadSize);
+            uploadSize = (TextView) convertView.findViewById(R.id.uploadSize);
             tvProgress = (TextView) convertView.findViewById(R.id.tvProgress);
             netSpeed = (TextView) convertView.findViewById(R.id.netSpeed);
             pbProgress = (NumberProgressBar) convertView.findViewById(R.id.pbProgress);
-            download = (Button) convertView.findViewById(R.id.start);
+            upload = (Button) convertView.findViewById(R.id.start);
             remove = (Button) convertView.findViewById(R.id.remove);
             restart = (Button) convertView.findViewById(R.id.restart);
+        }
+
+        public void refresh(UploadTask uploadTask) {
+            this.uploadTask = uploadTask;
+            refresh();
+        }
+
+        private void refresh() {
+            Log.v(TAG, "refresh");
+            float progress = uploadTask.index * 1.0f / uploadTask.count;
+            String jd = (Math.round(progress * 10000) * 1.0f / 100) + "%";
+            Log.v(TAG, "当前上传的进度：" + jd);
+            tvProgress.setText(jd);
+            pbProgress.setMax((int) uploadTask.count);
+            pbProgress.setProgress((int) uploadTask.index);
+
+
+            String fileSize = "0M";
+            if (uploadTask.fileSize != 0) {
+                fileSize = Formatter.formatFileSize(UploadManagerActivity.this, uploadTask.fileSize);
+            }
+            Log.v(TAG, "fileSize===" + fileSize);
+
+            String uploaded = "--M/--M";
+            String netspeed = "---K/s";
+
+            if (uploadTask.index == uploadTask.count && uploadTask.index != 0) {
+                uploaded = fileSize + "/" + fileSize;
+
+                netspeed = "上传完成";
+            } else {
+                uploaded = uploadTask.index * 5 + "M/" + fileSize;
+
+                long speed;
+                try {
+                    speed = (5 * 1024 * 1024) / uploadTask.time;
+                } catch (RuntimeException e) {
+                    speed = 0;
+                }
+                netspeed = Formatter.formatFileSize(UploadManagerActivity.this, speed) + "/s";
+            }
+
+            Log.v(TAG, "uploaded===" + uploaded);
+            uploadSize.setText(uploaded);
+            Log.v(TAG, "netspeed===" + netspeed);
+            netSpeed.setText(netspeed);
 
         }
 
-        /**
-         * Called when a view has been clicked.
-         *
-         * @param v The view that was clicked.
-         */
         @Override
         public void onClick(View v) {
+            if (v.getId() == upload.getId()) {
+                Log.v(TAG, "upload");
 
+            } else if (v.getId() == remove.getId()) {
+                Log.v(TAG, "remove");
+
+            } else if (v.getId() == restart.getId()) {
+                Log.v(TAG, "restart");
+
+            }
+        }
+    }
+
+
+    public class MyUploadListener extends UploadListener {
+
+        /**
+         * 上传进行时回调
+         *
+         * @param uploadTask
+         */
+        @Override
+        public void onProgress(UploadTask uploadTask) {
+            Log.v(TAG, "onProgress");
+            if (getUserTag() == null) return;
+            ViewHolder holder = (ViewHolder) getUserTag();
+            holder.refresh();
         }
     }
 
