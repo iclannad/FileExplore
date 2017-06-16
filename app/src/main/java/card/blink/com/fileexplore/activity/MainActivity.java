@@ -356,7 +356,8 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
             //FileTransportUtils.uploadFileToExternalStorage(path, uploadPath, handler);
             Log.v(TAG, "在服务上传上传文件");
             UploadTask uploadTask = new UploadTask();
-            uploadTask.status = Comment.BEFORE;
+            uploadTask.status = UploadManager.WAIT;
+            uploadTask.switch_status = UploadManager.NONE_TO_WAIT;
             uploadTask.name = strings[strings.length - 1];
             uploadTask.fromUrl = path;
             uploadTask.toUrl = uploadPath;

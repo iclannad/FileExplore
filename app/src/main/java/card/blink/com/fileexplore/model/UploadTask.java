@@ -2,6 +2,8 @@ package card.blink.com.fileexplore.model;
 
 import android.os.Handler;
 
+import java.security.PublicKey;
+
 import card.blink.com.fileexplore.service.UploadTaskCallback;
 import card.blink.com.fileexplore.upload.UploadListener;
 
@@ -12,6 +14,8 @@ public class UploadTask {
 
     public int id;
     public int status;
+    public int switch_status;
+
     public String name;
     public String fromUrl;
     public String toUrl;

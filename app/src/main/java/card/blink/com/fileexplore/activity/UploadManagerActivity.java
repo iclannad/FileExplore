@@ -173,13 +173,11 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
         }
 
         private void refresh() {
-            if (uploadTask.status == Comment.RUNNING) {
-                upload.setText("暂停");
-            } else {
-                upload.setText("上传");
+            if (uploadTask.status == UploadManager.PAUSE) {
+                netSpeed.setText("暂停中");
+                return;
             }
 
-            Log.v(TAG, "refresh");
             float progress = uploadTask.index * 1.0f / uploadTask.count;
             String jd = (Math.round(progress * 10000) * 1.0f / 100) + "%";
             Log.v(TAG, "当前上传的进度：" + jd);
@@ -212,11 +210,7 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
             Log.v(TAG, "uploaded===" + uploaded);
             uploadSize.setText(uploaded);
             Log.v(TAG, "netspeed===" + netspeed);
-            if (uploadTask.status == Comment.PAUSE) {
-                netSpeed.setText("暂停中");
-            } else {
-                netSpeed.setText(netspeed);
-            }
+            netSpeed.setText(netspeed);
 
         }
 
@@ -224,23 +218,52 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
         public void onClick(View v) {
             if (v.getId() == upload.getId()) {
                 Log.v(TAG, "upload");
-                if (uploadTask.status != Comment.PAUSE) {
-                    UploadManager.getInstance().pauseTask(uploadTask);
-                    upload.setText("下载");
-                    netSpeed.setText("暂停中");
-                } else {
-                    UploadManager.getInstance().startTask(uploadTask);
-                    upload.setText("暂停");
-                    // 唤醒子线程
-                    synchronized (uploadTask) {
-                        uploadTask.notify();
+                if (uploadTask.status == UploadManager.RUNING) {
+                    uploadTask.status = UploadManager.PAUSE;
+                    Log.v(TAG, "PAUSE");
+                    uploadTask.switch_status = UploadManager.RUNNING_TO_PAUSE;
+                    upload.setText("上传");
+                } else if (uploadTask.status == UploadManager.PAUSE) {
+                    uploadTask.status = UploadManager.RUNING;
+                    Log.v(TAG, "RUNNING");
+                    if (uploadTask.switch_status == UploadManager.RUNNING_TO_PAUSE) {
+                        uploadTask.switch_status = UploadManager.PAUSE_TO_RUNNING;
+                        synchronized (uploadTask) {
+                            uploadTask.notify();
+                        }
                     }
+                    upload.setText("暂停");
                 }
+
 
             } else if (v.getId() == remove.getId()) {
                 Log.v(TAG, "remove");
-                UploadManager.getInstance().removeTask(uploadTask);
+                if (uploadTask.status == UploadManager.RUNING) {
+                    // 任务在运行时删除
+                    UploadManager.getInstance().removeTask(uploadTask);
+                    uploadTask.status = UploadManager.DELETE;
+                    uploadTask.switch_status = UploadManager.RUNNING_TO_DELETE;
+                } else if (uploadTask.status == UploadManager.WAIT) {
+                    // 任务在等待时删除
+                    UploadManager.getInstance().removeTask(uploadTask);
+                    uploadTask.status = UploadManager.DELETE;
+                    uploadTask.switch_status = UploadManager.WAIT_TO_DELETE;
+                } else if (uploadTask.status == UploadManager.PAUSE) {
+                    // 任务在暂停时删除
+                    uploadTask.status = UploadManager.DELETE;
+                    uploadTask.switch_status = UploadManager.PAUSE_TO_DELETE;
+                    UploadManager.getInstance().removeTask(uploadTask);
+                    synchronized (uploadTask) {
+                        uploadTask.notify();
+                    }
+                } else if (uploadTask.status == UploadManager.FINISH) {
+                    // 任务下载完成时删除
+                    if (uploadTask.switch_status == UploadManager.RUNNING_TO_FINISH) {
+                        UploadManager.getInstance().removeTask(uploadTask);
+                    }
+                }
                 adapter.notifyDataSetChanged();
+
             }
         }
     }

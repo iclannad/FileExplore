@@ -1,5 +1,7 @@
 package card.blink.com.fileexplore.service;
 
+import card.blink.com.fileexplore.model.UploadTask;
+
 /**
  * Created by Administrator on 2017/6/13.
  */
@@ -22,5 +24,5 @@ public interface UploadTaskCallback {
     /**
      * 任务上传结束
      */
-    void finished();
+    void finished(UploadTask uploadTask);
 }

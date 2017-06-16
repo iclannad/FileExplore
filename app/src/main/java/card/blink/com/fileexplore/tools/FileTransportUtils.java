@@ -21,6 +21,7 @@ import java.util.Arrays;
 import card.blink.com.fileexplore.gson.FileListData;
 import card.blink.com.fileexplore.model.UploadTask;
 import card.blink.com.fileexplore.service.UploadTaskCallback;
+import card.blink.com.fileexplore.upload.UploadManager;
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -196,6 +197,22 @@ public class FileTransportUtils {
         }
 
         while (index <= count) {
+
+            if (uploadTask.status == UploadManager.PAUSE) {
+                Log.v(TAG,"PAUSE");
+                if (uploadTask.switch_status == UploadManager.RUNNING_TO_PAUSE) {
+                    Log.v(TAG,"RUNNING_TO_PAUSE");
+                    // 暂停的逻辑
+                    synchronized (uploadTask) {
+                        try {
+                            uploadTask.wait();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+
             // 请求上传index块
             long timeMillisBefore = System.currentTimeMillis();
             uploading(file, index, count, uploadTask.toUrl, uploadTask.handler);
@@ -213,40 +230,34 @@ public class FileTransportUtils {
             uploadTask.count = count;
 
             if (index == count && index != 0) {
+                // 更新任务的状态为完成
+                uploadTask.status = UploadManager.FINISH;
+                uploadTask.switch_status = UploadManager.RUNNING_TO_FINISH;
                 // 回调给service
                 UploadTaskCallback callback = uploadTask.uploadTaskCallback;
                 if (callback != null) {
-                    callback.finished();
+                    callback.finished(uploadTask);
                 }
-                // 更新任务的状态为完成
-                uploadTask.status = Comment.AFTER;
             }
 
-            if (uploadTask.status == Comment.PAUSE) {
-                // 阻塞子线程
-                synchronized (uploadTask) {
-                    try {
-                        uploadTask.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+            // 如果当任务已经被删除
+            if (uploadTask.status == UploadManager.DELETE) {
+                Log.v(TAG,"任务已被删除");
+                if (uploadTask.switch_status == UploadManager.RUNNING_TO_DELETE) {
+                    UploadTaskCallback callback = uploadTask.uploadTaskCallback;
+                    if (callback != null) {
+                        callback.finished(uploadTask);
                     }
+                    break;
+                } else if (uploadTask.switch_status == UploadManager.PAUSE_TO_DELETE) {
+                    UploadTaskCallback callback = uploadTask.uploadTaskCallback;
+                    if (callback != null) {
+                        callback.finished(uploadTask);
+                    }
+                    break;
                 }
             }
-            /**
-             * 判断文件是否已经被删除
-             */
-            if (uploadTask.status == Comment.DELETE) {
 
-                // 回调给service
-                UploadTaskCallback callback = uploadTask.uploadTaskCallback;
-                if (callback != null) {
-                    callback.finished();
-                }
-                // 更新任务的状态为完成
-                uploadTask.status = Comment.AFTER;
-
-                break;
-            }
 
             // 发信号到主线程
             Message msg = Message.obtain();

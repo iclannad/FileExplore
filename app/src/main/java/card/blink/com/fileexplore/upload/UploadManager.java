@@ -1,5 +1,9 @@
 package card.blink.com.fileexplore.upload;
 
+import android.graphics.Paint;
+
+import java.security.PublicKey;
+import java.util.ArrayList;
 import java.util.List;
 
 import card.blink.com.fileexplore.model.UploadTask;
@@ -11,13 +15,27 @@ import card.blink.com.fileexplore.tools.Comment;
 
 public class UploadManager {
 
-    //定义上传状态常量
-    public static final int NONE = 0;         //无状态  --> 等待
-    public static final int WAITING = 1;      //等待    --> 上传，暂停
-    public static final int UPLOADING = 2;  //上传中  --> 暂停，完成，错误
-    public static final int PAUSE = 3;        //暂停    --> 等待，上传
-    public static final int FINISH = 4;       //完成    --> 重新上传
-    public static final int ERROR = 5;        //错误    --> 等待
+
+    // 记录状态转换
+    public static final int NONE_TO_WAIT = 0;
+    public static final int WAIT_TO_RUNNING = 1;
+    public static final int RUNNING_TO_FINISH = 2;
+    public static final int WAIT_TO_DELETE = 3;
+    public static final int RUNNING_TO_DELETE = 4;
+    public static final int FINISH_TO_DELETE = 5;
+    public static final int WAIT_TO_PAUSE = 6;
+    public static final int RUNNING_TO_PAUSE = 7;
+    public static final int PAUSE_TO_DELETE = 8;
+    public static final int PAUSE_TO_WAIT = 9;
+    public static final int PAUSE_TO_RUNNING = 10;
+
+    // 定义上传变量
+    public static final int WAIT = 11;
+    public static final int RUNING = 12;
+    public static final int FINISH = 13;
+    public static final int PAUSE = 14;
+    public static final int DELETE = 15;
+
 
     private static UploadManager mInstance;
 
@@ -51,7 +69,7 @@ public class UploadManager {
      *
      * @return
      */
-    public List<UploadTask> getAllTask() {
+    public ArrayList<UploadTask> getAllTask() {
         return Comment.TASK_ARRAY_LIST;
     }
 
@@ -69,47 +87,56 @@ public class UploadManager {
      * @param uploadTask
      */
     public void removeTask(UploadTask uploadTask) {
-        if (Comment.TASK_ARRAY_LIST.isEmpty()) {
-            return;
-        }
-        // 在任务暂停过程中删除任务
-        if (uploadTask.status == Comment.PAUSE) {
-            uploadTask.status = Comment.DELETE;
-            synchronized (uploadTask) {
-                uploadTask.notify();
-            }
-        }
-
-        uploadTask.status = Comment.DELETE;
         Comment.TASK_ARRAY_LIST.remove(uploadTask);
     }
 
     /**
      * 暂停指定的任务
+     *
      * @param uploadTask
      */
     public void pauseTask(UploadTask uploadTask) {
-        uploadTask.status = Comment.PAUSE;
+        uploadTask.status = UploadManager.PAUSE;
     }
 
     /**
      * 开始指定的任务
      */
     public void startTask(UploadTask uploadTask) {
-        uploadTask.status = Comment.RUNNING;
+        uploadTask.status = WAIT;
     }
 
     /**
      * 清除上传列表中所有任务
+     * <p>
+     * 在删除上传任务时，此时任务的状态有几种：
+     * 等待，进行，完成，暂停，需要对这几种情况分别处理
      */
     public void clearAllTask() {
         if (Comment.TASK_ARRAY_LIST.isEmpty()) {
             return;
         }
-
         for (int i = 0; i < Comment.TASK_ARRAY_LIST.size(); i++) {
             UploadTask uploadTask = Comment.TASK_ARRAY_LIST.get(i);
-            uploadTask.status = Comment.DELETE;
+            if (uploadTask.status == WAIT) {
+                uploadTask.status = DELETE;
+                uploadTask.switch_status = WAIT_TO_DELETE;
+            } else if (uploadTask.status == RUNING) {
+                uploadTask.status = DELETE;
+                uploadTask.switch_status = RUNNING_TO_DELETE;
+                synchronized (uploadTask) {
+                    uploadTask.notify();
+                }
+            } else if (uploadTask.status == FINISH) {
+                uploadTask.status = DELETE;
+                uploadTask.switch_status = FINISH_TO_DELETE;
+            } else if (uploadTask.status == PAUSE) {
+                uploadTask.status = DELETE;
+                uploadTask.switch_status = PAUSE_TO_DELETE;
+                synchronized (uploadTask) {
+                    uploadTask.notify();
+                }
+            }
         }
         Comment.TASK_ARRAY_LIST.clear();
     }
@@ -117,6 +144,9 @@ public class UploadManager {
 
     /**
      * 暂停所有的任务
+     * <p>
+     * 在暂停所有上传任务时，需要对几种情况进行处理：
+     * 等待，进行，完成，暂停
      */
     public void pauseAllTask() {
         if (Comment.TASK_ARRAY_LIST.isEmpty()) {
@@ -125,21 +155,25 @@ public class UploadManager {
 
         for (int i = 0; i < Comment.TASK_ARRAY_LIST.size(); i++) {
             UploadTask uploadTask = Comment.TASK_ARRAY_LIST.get(i);
-
-            if (uploadTask.status == Comment.PAUSE) {
-                break;
+            if (uploadTask.status == WAIT) {
+                uploadTask.status = PAUSE;
+                uploadTask.switch_status = WAIT_TO_PAUSE;
+            } else if (uploadTask.status == RUNING) {
+                uploadTask.status = PAUSE;
+                uploadTask.switch_status = RUNNING_TO_PAUSE;
+            } else if (uploadTask.status == FINISH) {
+                // 不处理
+            } else if (uploadTask.status == PAUSE) {
+                // 不处理
             }
-
-            if (uploadTask.status == Comment.RUNNING) {
-                uploadTask.status = Comment.PAUSE;
-                break;
-            }
-
         }
+
     }
 
     /**
      * 开始所有的任务
+     * 在开始所有上传任务时，需要对几种情况进行处理：
+     * 等待，进行，完成，暂停
      */
     public void startAllTask() {
         if (Comment.TASK_ARRAY_LIST.isEmpty()) {
@@ -148,11 +182,22 @@ public class UploadManager {
 
         for (int i = 0; i < Comment.TASK_ARRAY_LIST.size(); i++) {
             UploadTask uploadTask = Comment.TASK_ARRAY_LIST.get(i);
-            if (uploadTask.status == Comment.PAUSE) {
-                synchronized (uploadTask) {
-                    uploadTask.status = Comment.RUNNING;
-                    uploadTask.notify();
-                    break;
+            if (uploadTask.status == WAIT) {
+                // 不处理
+            } else if (uploadTask.status == RUNING) {
+                // 不处理
+            } else if (uploadTask.status == FINISH) {
+                // 不处理
+            } else if (uploadTask.status == PAUSE) {
+                if (uploadTask.switch_status == UploadManager.WAIT_TO_PAUSE) {
+                    uploadTask.status = WAIT;
+                    uploadTask.switch_status = PAUSE_TO_WAIT;
+                } else if (uploadTask.switch_status == UploadManager.RUNNING_TO_PAUSE) {
+                    uploadTask.status = RUNING;
+                    uploadTask.switch_status = PAUSE_TO_RUNNING;
+                    synchronized (uploadTask) {
+                        uploadTask.notify();
+                    }
                 }
             }
         }

@@ -12,6 +12,7 @@ import com.lzy.okgo.OkGo;
 import com.lzy.okserver.download.DownloadManager;
 import com.lzy.okserver.download.DownloadService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import card.blink.com.fileexplore.model.UploadTask;
@@ -58,19 +59,22 @@ public class UploadService extends Service implements UploadTaskCallback{
 
 
     public void startTask() {
-        for (int i = 0; i < Comment.TASK_ARRAY_LIST.size(); i++) {
-            UploadTask uploadTask = Comment.TASK_ARRAY_LIST.get(i);
-            if (uploadTask.status == Comment.BEFORE) {
+        ArrayList<UploadTask> allUploadTasks = UploadManager.getInstance().getAllTask();
+        for (int i = 0; i < allUploadTasks.size(); i++) {
+            UploadTask uploadTask = allUploadTasks.get(i);
+            if (uploadTask.status == UploadManager.WAIT) {
                 Log.v(TAG, "有任务需要开始 task: " + uploadTask.name);
-                uploadTask.status = Comment.RUNNING;
-                uploadTask.uploadTaskCallback = this;
-                //FileTransportUtils.uploadFileToExternalStorage(uploadTask.fromUrl, uploadTask.toUrl, uploadTask.handler);
-                FileTransportUtils.uploadFileToExternalStorage(uploadTask);
+                if (uploadTask.switch_status == UploadManager.NONE_TO_WAIT
+                        || uploadTask.switch_status == UploadManager.PAUSE_TO_WAIT) {
+                    uploadTask.status = UploadManager.RUNING;
+                    uploadTask.switch_status = UploadManager.WAIT_TO_RUNNING;
+                    uploadTask.uploadTaskCallback = this;
+                    FileTransportUtils.uploadFileToExternalStorage(uploadTask);
+                }
                 return;
             }
         }
         Log.v(TAG, "所有等待中的任务都开启完毕，此时可以关闭服务和清空任和列表");
-        //UploadManager.getInstance().clearAllTask();
         stopSelf();
     }
 
@@ -127,7 +131,7 @@ public class UploadService extends Service implements UploadTaskCallback{
      * 任务上传结束
      */
     @Override
-    public void finished() {
+    public void finished(UploadTask uploadTask) {
         startTask();
     }
 }
