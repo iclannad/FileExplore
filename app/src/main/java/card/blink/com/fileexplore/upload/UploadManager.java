@@ -62,10 +62,101 @@ public class UploadManager {
         Comment.TASK_ARRAY_LIST.add(uploadTask);
     }
 
+
+    /**
+     * 从任务列表中删除任务
+     *
+     * @param uploadTask
+     */
+    public void removeTask(UploadTask uploadTask) {
+        if (Comment.TASK_ARRAY_LIST.isEmpty()) {
+            return;
+        }
+        // 在任务暂停过程中删除任务
+        if (uploadTask.status == Comment.PAUSE) {
+            uploadTask.status = Comment.DELETE;
+            synchronized (uploadTask) {
+                uploadTask.notify();
+            }
+        }
+
+        uploadTask.status = Comment.DELETE;
+        Comment.TASK_ARRAY_LIST.remove(uploadTask);
+    }
+
+    /**
+     * 暂停指定的任务
+     * @param uploadTask
+     */
+    public void pauseTask(UploadTask uploadTask) {
+        uploadTask.status = Comment.PAUSE;
+    }
+
+    /**
+     * 开始指定的任务
+     */
+    public void startTask(UploadTask uploadTask) {
+        uploadTask.status = Comment.RUNNING;
+    }
+
     /**
      * 清除上传列表中所有任务
      */
     public void clearAllTask() {
+        if (Comment.TASK_ARRAY_LIST.isEmpty()) {
+            return;
+        }
+
+        for (int i = 0; i < Comment.TASK_ARRAY_LIST.size(); i++) {
+            UploadTask uploadTask = Comment.TASK_ARRAY_LIST.get(i);
+            uploadTask.status = Comment.DELETE;
+        }
         Comment.TASK_ARRAY_LIST.clear();
     }
+
+
+    /**
+     * 暂停所有的任务
+     */
+    public void pauseAllTask() {
+        if (Comment.TASK_ARRAY_LIST.isEmpty()) {
+            return;
+        }
+
+        for (int i = 0; i < Comment.TASK_ARRAY_LIST.size(); i++) {
+            UploadTask uploadTask = Comment.TASK_ARRAY_LIST.get(i);
+
+            if (uploadTask.status == Comment.PAUSE) {
+                break;
+            }
+
+            if (uploadTask.status == Comment.RUNNING) {
+                uploadTask.status = Comment.PAUSE;
+                break;
+            }
+
+        }
+    }
+
+    /**
+     * 开始所有的任务
+     */
+    public void startAllTask() {
+        if (Comment.TASK_ARRAY_LIST.isEmpty()) {
+            return;
+        }
+
+        for (int i = 0; i < Comment.TASK_ARRAY_LIST.size(); i++) {
+            UploadTask uploadTask = Comment.TASK_ARRAY_LIST.get(i);
+            if (uploadTask.status == Comment.PAUSE) {
+                synchronized (uploadTask) {
+                    uploadTask.status = Comment.RUNNING;
+                    uploadTask.notify();
+                    break;
+                }
+            }
+        }
+    }
+
+
 }

@@ -186,9 +186,15 @@ public class FileTransportUtils {
         } else {
             count++;
         }
+
         Log.v(TAG, "需要分割成的块数是 count===" + count);
 
         int index = 1;
+        Log.v(TAG, "uploadTask.index==" + uploadTask.index);
+        if (uploadTask.index != 0) {
+            index = (int) uploadTask.index;
+        }
+
         while (index <= count) {
             // 请求上传index块
             long timeMillisBefore = System.currentTimeMillis();
@@ -226,6 +232,21 @@ public class FileTransportUtils {
                     }
                 }
             }
+            /**
+             * 判断文件是否已经被删除
+             */
+            if (uploadTask.status == Comment.DELETE) {
+
+                // 回调给service
+                UploadTaskCallback callback = uploadTask.uploadTaskCallback;
+                if (callback != null) {
+                    callback.finished();
+                }
+                // 更新任务的状态为完成
+                uploadTask.status = Comment.AFTER;
+
+                break;
+            }
 
             // 发信号到主线程
             Message msg = Message.obtain();
@@ -235,6 +256,8 @@ public class FileTransportUtils {
 
             index++;
         }
+
+        Log.v(TAG, "退出上传文件");
 
     }
 

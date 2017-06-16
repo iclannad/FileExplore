@@ -75,21 +75,23 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
     @OnClick(R.id.removeAll)
     public void removeAll() {
         Log.v(TAG, "removeAll");
+        UploadManager.getInstance().clearAllTask();
+        adapter.notifyDataSetChanged();
     }
 
     @OnClick(R.id.pauseAll)
     public void pauseAll() {
         Log.v(TAG, "pauseAll");
+        UploadManager.getInstance().pauseAllTask();
+        adapter.notifyDataSetChanged();
     }
 
-    @OnClick(R.id.stopAll)
-    public void stopAll() {
-        Log.v(TAG, "stopAll");
-    }
 
     @OnClick(R.id.startAll)
     public void startAll() {
         Log.v(TAG, "startAll");
+        UploadManager.getInstance().startAllTask();
+        adapter.notifyDataSetChanged();
     }
 
 
@@ -223,24 +225,22 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
             if (v.getId() == upload.getId()) {
                 Log.v(TAG, "upload");
                 if (uploadTask.status != Comment.PAUSE) {
-                    uploadTask.status = Comment.PAUSE;
+                    UploadManager.getInstance().pauseTask(uploadTask);
                     upload.setText("下载");
                     netSpeed.setText("暂停中");
                 } else {
-                    uploadTask.status = Comment.RUNNING;
+                    UploadManager.getInstance().startTask(uploadTask);
                     upload.setText("暂停");
-
                     // 唤醒子线程
                     synchronized (uploadTask) {
                         uploadTask.notify();
                     }
-
                 }
-                //upload.setText("下载");
 
             } else if (v.getId() == remove.getId()) {
                 Log.v(TAG, "remove");
-
+                UploadManager.getInstance().removeTask(uploadTask);
+                adapter.notifyDataSetChanged();
             }
         }
     }

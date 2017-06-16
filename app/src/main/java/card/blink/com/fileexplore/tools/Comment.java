@@ -19,6 +19,7 @@ public class Comment {
     public final static int RUNNING = 1;
     public final static int AFTER = 2;
     public final static int PAUSE = 3;
+    public final static int DELETE = 5;
 
     public static final int ERROR = -1;
     public static final int SUCCESS = 1;
