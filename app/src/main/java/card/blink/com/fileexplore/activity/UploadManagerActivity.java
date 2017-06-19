@@ -151,7 +151,11 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
                 holder.uploadSize.setText(uploaded + "/" + uploaded);
                 holder.pbProgress.setMax(1);
                 holder.pbProgress.setProgress(1);
-
+            } else if (uploadTask.status == UploadManager.PAUSE) {
+                if (uploadTask.count != 0) {
+                    holder.pbProgress.setMax((int) uploadTask.count);
+                    holder.pbProgress.setProgress((int) uploadTask.index);
+                }
             }
 
             // 条目的按钮的点击事件
@@ -202,11 +206,14 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
                 return;
             }
             if (uploadTask.status == UploadManager.PAUSE) {
+                upload.setText("上传");
                 netSpeed.setText("暂停中");
                 return;
             }
             if (uploadTask.status == UploadManager.RUNING) {
                 upload.setText("暂停");
+            } else if (uploadTask.status == UploadManager.FINISH) {
+                upload.setText("上传");
             }
 
 

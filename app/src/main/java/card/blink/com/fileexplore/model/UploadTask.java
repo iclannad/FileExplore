@@ -10,6 +10,7 @@ import java.security.PublicKey;
 
 import card.blink.com.fileexplore.service.UploadTaskCallback;
 import card.blink.com.fileexplore.upload.UploadListener;
+
 import org.greenrobot.greendao.annotation.Generated;
 
 /**
@@ -29,6 +30,8 @@ public class UploadTask {
     public long count;
 
     @Transient
+    public boolean isUploadTaskPauseOnRunning;
+    @Transient
     public long fileSize;
     @Transient
     public long time;
@@ -38,57 +41,74 @@ public class UploadTask {
     public UploadListener uploadListener;
     @Transient
     public UploadTaskCallback uploadTaskCallback;
+
     public long getIndex() {
         return this.index;
     }
+
     public void setIndex(long index) {
         this.index = index;
     }
+
     public String getToUrl() {
         return this.toUrl;
     }
+
     public void setToUrl(String toUrl) {
         this.toUrl = toUrl;
     }
+
     public String getFromUrl() {
         return this.fromUrl;
     }
+
     public void setFromUrl(String fromUrl) {
         this.fromUrl = fromUrl;
     }
+
     public String getName() {
         return this.name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
+
     public int getSwitch_status() {
         return this.switch_status;
     }
+
     public void setSwitch_status(int switch_status) {
         this.switch_status = switch_status;
     }
+
     public int getStatus() {
         return this.status;
     }
+
     public void setStatus(int status) {
         this.status = status;
     }
+
     public Long getId() {
         return this.id;
     }
+
     public void setId(Long id) {
         this.id = id;
     }
+
     public long getCount() {
         return this.count;
     }
+
     public void setCount(long count) {
         this.count = count;
     }
+
     @Generated(hash = 766294870)
     public UploadTask(Long id, int status, int switch_status, String name,
-            String fromUrl, String toUrl, long index, long count) {
+                      String fromUrl, String toUrl, long index, long count) {
         this.id = id;
         this.status = status;
         this.switch_status = switch_status;
@@ -98,6 +118,7 @@ public class UploadTask {
         this.index = index;
         this.count = count;
     }
+
     @Generated(hash = 976210108)
     public UploadTask() {
     }

@@ -23,7 +23,7 @@ import card.blink.com.fileexplore.upload.UploadManager;
 /**
  * 作用：文件传输的服务，可以在后台下载或者上传文件
  */
-public class UploadService extends Service implements UploadTaskCallback{
+public class UploadService extends Service implements UploadTaskCallback {
 
 
     private static final String TAG = UploadService.class.getSimpleName();
@@ -65,11 +65,23 @@ public class UploadService extends Service implements UploadTaskCallback{
                 Log.v(TAG, "有任务需要开始 task: " + uploadTask.name);
                 if (uploadTask.switch_status == UploadManager.NONE_TO_WAIT
                         || uploadTask.switch_status == UploadManager.PAUSE_TO_WAIT) {
+
                     uploadTask.status = UploadManager.RUNING;
                     uploadTask.switch_status = UploadManager.WAIT_TO_RUNNING;
                     uploadTask.uploadTaskCallback = this;
                     FileTransportUtils.uploadFileToExternalStorage(uploadTask);
                 }
+                return;
+            } else if (uploadTask.status == UploadManager.RUNING
+                    && uploadTask.isUploadTaskPauseOnRunning == false
+                    && uploadTask.switch_status == UploadManager.PAUSE_TO_RUNNING) {
+                Log.v(TAG, "uploadTask.status==" + uploadTask.status);
+                Log.v(TAG, "uploadTask.isUploadTaskPauseOnRunning==" + uploadTask.isUploadTaskPauseOnRunning);
+                Log.v(TAG, "uploadTask.switch_status==" + uploadTask.switch_status);
+
+                uploadTask.isUploadTaskPauseOnRunning = true;
+                uploadTask.uploadTaskCallback = this;
+                FileTransportUtils.uploadFileToExternalStorage(uploadTask);
                 return;
             }
         }

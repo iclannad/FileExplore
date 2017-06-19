@@ -267,6 +267,7 @@ public class FileTransportUtils {
                     break;
                 }
             }
+            Log.v(TAG, "uploadTask.handler==" + uploadTask.handler);
             if (uploadTask.handler != null) {
                 // 发信号到主线程
                 Message msg = Message.obtain();

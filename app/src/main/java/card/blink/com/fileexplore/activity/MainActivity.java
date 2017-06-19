@@ -240,7 +240,8 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
             String toUrl = uploadTask.toUrl;
             String fromUrl = uploadTask.fromUrl;
             Log.v(TAG, "id==" + id + " status==" + status + " switch_status==" + switch_status);
-            Log.v(TAG, "index==" + index + "count==" + count + " toUrl==" + toUrl + " fromUrl==" + fromUrl);
+            Log.v(TAG, "index==" + index + " count==" + count + " toUrl==" + toUrl + " fromUrl==" + fromUrl);
+            uploadTask.handler = handler;
         }
         UploadManager.getInstance().updateUploadTaskList(uploadTaskList);
     }
@@ -382,6 +383,7 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
             //FileTransportUtils.uploadFileToExternalStorage(path, uploadPath, handler);
             Log.v(TAG, "在服务上传上传文件");
             UploadTask uploadTask = new UploadTask();
+            uploadTask.isUploadTaskPauseOnRunning = true;
             uploadTask.status = UploadManager.WAIT;
             uploadTask.switch_status = UploadManager.NONE_TO_WAIT;
             uploadTask.name = strings[strings.length - 1];
