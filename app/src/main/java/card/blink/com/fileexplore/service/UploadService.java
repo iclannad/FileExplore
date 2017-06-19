@@ -57,7 +57,6 @@ public class UploadService extends Service implements UploadTaskCallback{
         return isRunning;
     }
 
-
     public void startTask() {
         ArrayList<UploadTask> allUploadTasks = UploadManager.getInstance().getAllTask();
         for (int i = 0; i < allUploadTasks.size(); i++) {

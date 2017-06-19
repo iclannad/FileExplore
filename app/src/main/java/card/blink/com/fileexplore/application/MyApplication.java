@@ -1,6 +1,7 @@
 package card.blink.com.fileexplore.application;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.lzy.okgo.OkGo;
 import com.lzy.okgo.cache.CacheEntity;
@@ -11,15 +12,22 @@ import com.zhy.http.okhttp.OkHttpUtils;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
+import card.blink.com.fileexplore.upload.GreenDaoManager;
 import okhttp3.OkHttpClient;
 
 /**
  * Created by Administrator on 2017/6/2.
  */
 public class MyApplication extends Application {
+
+    private static Context mContext;
+
     @Override
     public void onCreate() {
         super.onCreate();
+
+        mContext = getApplicationContext();
+        GreenDaoManager.getInstance();
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
 //                .addInterceptor(new LoggerInterceptor("TAG"))
@@ -89,5 +97,9 @@ public class MyApplication extends Application {
             e.printStackTrace();
         }
 
+    }
+
+    public static Context getContext() {
+        return mContext;
     }
 }

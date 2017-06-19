@@ -15,6 +15,7 @@ import com.lzy.okgo.OkGo;
 import com.lzy.okgo.request.GetRequest;
 import com.lzy.okserver.download.DownloadManager;
 import com.lzy.okserver.download.DownloadService;
+import com.wyk.greendaodemo.greendao.gen.UploadTaskDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,6 +32,7 @@ import card.blink.com.fileexplore.model.UploadTask;
 import card.blink.com.fileexplore.service.UploadService;
 import card.blink.com.fileexplore.tools.Comment;
 import card.blink.com.fileexplore.tools.FileTransportUtils;
+import card.blink.com.fileexplore.upload.GreenDaoManager;
 import card.blink.com.fileexplore.upload.UploadManager;
 import card.blink.com.fileexplore.view.MyProgressDIalog;
 import card.blink.com.fileexplore.view.PullToRefreshListView;
@@ -193,6 +195,8 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
         setTopTitleColor(R.color.White);
         setTopColor(R.color.logincolor);
 
+        initData();
+
         downloadManager = DownloadService.getDownloadManager();
         downloadManager.setTargetFolder(Environment.getExternalStorageDirectory().getAbsolutePath() + "/aaa/");
 
@@ -217,6 +221,28 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
 
         AllFile();
 
+    }
+
+    /**
+     * 初始化数据库
+     */
+    private void initData() {
+        Log.v(TAG, "从数据库中获取任务列表");
+        ArrayList<UploadTask> uploadTaskList = (ArrayList<UploadTask>) GreenDaoManager.getInstance().getSession().getUploadTaskDao().queryBuilder().list();
+        Log.v(TAG, "uploadTaskList.size()===" + uploadTaskList.size());
+        for (int i = 0; i < uploadTaskList.size(); i++) {
+            UploadTask uploadTask = uploadTaskList.get(i);
+            Long id = uploadTask.id;
+            int status = uploadTask.status;
+            int switch_status = uploadTask.switch_status;
+            long index = uploadTask.index;
+            long count = uploadTask.count;
+            String toUrl = uploadTask.toUrl;
+            String fromUrl = uploadTask.fromUrl;
+            Log.v(TAG, "id==" + id + " status==" + status + " switch_status==" + switch_status);
+            Log.v(TAG, "index==" + index + "count==" + count + " toUrl==" + toUrl + " fromUrl==" + fromUrl);
+        }
+        UploadManager.getInstance().updateUploadTaskList(uploadTaskList);
     }
 
     @OnClick(R.id.btn_download)
@@ -364,6 +390,11 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
             uploadTask.handler = handler;
             //Comment.TASK_ARRAY_LIST.add(uploadTask);
             UploadManager.getInstance().addTask(uploadTask);
+            // 将上传任务添加到数据库
+            UploadTaskDao uploadTaskDao = GreenDaoManager.getInstance().getSession().getUploadTaskDao();
+            long insert = uploadTaskDao.insert(uploadTask);
+            Log.v(TAG, "insert==" + insert);
+
             startService(new Intent(this, UploadService.class));
         }
 
@@ -402,6 +433,9 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                     Toast.LENGTH_SHORT).show();
             exitTime = System.currentTimeMillis();
         } else {
+            // 程序关闭前可以在此处将数据保存至数据库
+            Log.v(TAG, "关闭app");
+
             getWindow().clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
             // 退出当前的程序
             moveTaskToBack(true);
@@ -411,4 +445,10 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
         }
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.v(TAG, "onDestroy");
+    }
 }

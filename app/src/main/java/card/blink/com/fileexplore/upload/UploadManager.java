@@ -2,6 +2,8 @@ package card.blink.com.fileexplore.upload;
 
 import android.graphics.Paint;
 
+import com.wyk.greendaodemo.greendao.gen.UploadTaskDao;
+
 import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
@@ -139,6 +141,9 @@ public class UploadManager {
             }
         }
         Comment.TASK_ARRAY_LIST.clear();
+        // 更新数据库里面的状态
+        UploadTaskDao uploadTaskDao = GreenDaoManager.getInstance().getSession().getUploadTaskDao();
+        uploadTaskDao.deleteAll();
     }
 
 
@@ -153,6 +158,9 @@ public class UploadManager {
             return;
         }
 
+        // 更新数据库里面的状态
+        UploadTaskDao uploadTaskDao = GreenDaoManager.getInstance().getSession().getUploadTaskDao();
+
         for (int i = 0; i < Comment.TASK_ARRAY_LIST.size(); i++) {
             UploadTask uploadTask = Comment.TASK_ARRAY_LIST.get(i);
             if (uploadTask.status == WAIT) {
@@ -166,6 +174,7 @@ public class UploadManager {
             } else if (uploadTask.status == PAUSE) {
                 // 不处理
             }
+            uploadTaskDao.update(uploadTask);
         }
 
     }
@@ -179,6 +188,8 @@ public class UploadManager {
         if (Comment.TASK_ARRAY_LIST.isEmpty()) {
             return;
         }
+        // 更新数据库里面的状态
+        UploadTaskDao uploadTaskDao = GreenDaoManager.getInstance().getSession().getUploadTaskDao();
 
         for (int i = 0; i < Comment.TASK_ARRAY_LIST.size(); i++) {
             UploadTask uploadTask = Comment.TASK_ARRAY_LIST.get(i);
@@ -200,8 +211,21 @@ public class UploadManager {
                     }
                 }
             }
+
+            // 更新状态值
+            uploadTaskDao.update(uploadTask);
         }
     }
 
 
+    /**
+     * 更新上传任务列表
+     */
+    public void updateUploadTaskList(ArrayList<UploadTask> list) {
+        Comment.TASK_ARRAY_LIST.clear();
+        if (list == null) {
+            return;
+        }
+        Comment.TASK_ARRAY_LIST.addAll(list);
+    }
 }

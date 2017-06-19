@@ -1,8 +1,15 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.greenrobot.greendao'
 
 def buildSdkVersion = 24
 def buildToolVersion = "24.0.3"
 def supportVersion = "24.2.1"
+
+greendao {
+    schemaVersion 1
+    daoPackage 'com.wyk.greendaodemo.greendao.gen'
+    targetGenDir 'src/main/java'
+}
 
 android {
     compileSdkVersion 23
@@ -49,5 +56,7 @@ dependencies {
     compile project(':okserver')
 
     compile 'com.github.bumptech.glide:glide:3.6.1'
+    compile 'org.greenrobot:greendao:3.0.1'
+    compile 'org.greenrobot:greendao-generator:3.0.0'
 
 }

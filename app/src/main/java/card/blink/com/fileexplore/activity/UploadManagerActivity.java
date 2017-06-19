@@ -14,7 +14,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.lzy.okserver.upload.UploadInfo;
+import com.wyk.greendaodemo.greendao.gen.UploadTaskDao;
 
+import java.io.File;
 import java.io.IOError;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -26,6 +28,7 @@ import card.blink.com.fileexplore.activity.base.UploadAndDownloadBaseActivity;
 import card.blink.com.fileexplore.model.UploadTask;
 import card.blink.com.fileexplore.service.UploadService;
 import card.blink.com.fileexplore.tools.Comment;
+import card.blink.com.fileexplore.upload.GreenDaoManager;
 import card.blink.com.fileexplore.upload.UploadListener;
 import card.blink.com.fileexplore.upload.UploadManager;
 import card.blink.com.fileexplore.view.NumberProgressBar;
@@ -136,7 +139,20 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
             long count = uploadTask.count;
             Log.v(TAG, "name==" + name + "---index==" + index + "---count==" + count);
 
+
             holder.refresh(uploadTask);
+            if (uploadTask.status == UploadManager.FINISH) {
+                holder.netSpeed.setText("已完成");
+                holder.tvProgress.setText("100.0%");
+                File file = new File(uploadTask.fromUrl);
+                long size = file.length();
+                Log.v(TAG, "size==" + size);
+                String uploaded = Formatter.formatFileSize(UploadManagerActivity.this, size);
+                holder.uploadSize.setText(uploaded + "/" + uploaded);
+                holder.pbProgress.setMax(1);
+                holder.pbProgress.setProgress(1);
+
+            }
 
             // 条目的按钮的点击事件
             holder.upload.setOnClickListener(holder);
@@ -251,10 +267,14 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
                         uploadTask.status = UploadManager.WAIT;
                         uploadTask.switch_status = UploadManager.PAUSE_TO_WAIT;
                     }
+
                     upload.setText("暂停");
                     startService(new Intent(UploadManagerActivity.this, UploadService.class));
                 }
 
+                // 更新数据库里面的状态
+                UploadTaskDao uploadTaskDao = GreenDaoManager.getInstance().getSession().getUploadTaskDao();
+                uploadTaskDao.update(uploadTask);
 
             } else if (v.getId() == remove.getId()) {
                 Log.v(TAG, "remove");
@@ -283,6 +303,10 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
                         UploadManager.getInstance().removeTask(uploadTask);
                     }
                 }
+                // 更新数据库里面的状态
+                UploadTaskDao uploadTaskDao = GreenDaoManager.getInstance().getSession().getUploadTaskDao();
+                uploadTaskDao.delete(uploadTask);
+
                 adapter.notifyDataSetChanged();
 
             }

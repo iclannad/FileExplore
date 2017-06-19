@@ -11,8 +11,11 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.wyk.greendaodemo.greendao.gen.UploadTaskDao;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.FileCallBack;
+
+import org.greenrobot.greendao.query.WhereCondition;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +24,7 @@ import java.util.Arrays;
 import card.blink.com.fileexplore.gson.FileListData;
 import card.blink.com.fileexplore.model.UploadTask;
 import card.blink.com.fileexplore.service.UploadTaskCallback;
+import card.blink.com.fileexplore.upload.GreenDaoManager;
 import card.blink.com.fileexplore.upload.UploadManager;
 import okhttp3.Call;
 import okhttp3.MediaType;
@@ -233,6 +237,11 @@ public class FileTransportUtils {
                 // 更新任务的状态为完成
                 uploadTask.status = UploadManager.FINISH;
                 uploadTask.switch_status = UploadManager.RUNNING_TO_FINISH;
+                // 更新数据库里面的状态
+                UploadTaskDao uploadTaskDao = GreenDaoManager.getInstance().getSession().getUploadTaskDao();
+                uploadTaskDao.update(uploadTask);
+
+
                 // 回调给service
                 UploadTaskCallback callback = uploadTask.uploadTaskCallback;
                 if (callback != null) {
@@ -258,14 +267,13 @@ public class FileTransportUtils {
                     break;
                 }
             }
-
-
-            // 发信号到主线程
-            Message msg = Message.obtain();
-            msg.what = Comment.UPLOADING;
-            msg.obj = uploadTask;
-            uploadTask.handler.sendMessage(msg);
-
+            if (uploadTask.handler != null) {
+                // 发信号到主线程
+                Message msg = Message.obtain();
+                msg.what = Comment.UPLOADING;
+                msg.obj = uploadTask;
+                uploadTask.handler.sendMessage(msg);
+            }
             index++;
         }
 
@@ -302,14 +310,16 @@ public class FileTransportUtils {
             Log.v(TAG, "index===" + index + "   count===" + count);
             // 上传最后一块完成时，文件上传成功
             if (index == count) {
-                // 发送上传成功信息
-                Message msg = Message.obtain();
-                msg.what = Comment.UPLOAD_SUCCESS;
-                String[] strings = uploadPath.split("/");
-                String name = strings[strings.length - 1];
-                Log.v(TAG, "name===" + name);
-                msg.obj = name;
-                handler.sendMessage(msg);
+                if (handler != null) {
+                    // 发送上传成功信息
+                    Message msg = Message.obtain();
+                    msg.what = Comment.UPLOAD_SUCCESS;
+                    String[] strings = uploadPath.split("/");
+                    String name = strings[strings.length - 1];
+                    Log.v(TAG, "name===" + name);
+                    msg.obj = name;
+                    handler.sendMessage(msg);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
