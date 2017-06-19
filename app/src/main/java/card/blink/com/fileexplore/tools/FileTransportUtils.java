@@ -199,9 +199,9 @@ public class FileTransportUtils {
         while (index <= count) {
 
             if (uploadTask.status == UploadManager.PAUSE) {
-                Log.v(TAG,"PAUSE");
+                Log.v(TAG, "PAUSE");
                 if (uploadTask.switch_status == UploadManager.RUNNING_TO_PAUSE) {
-                    Log.v(TAG,"RUNNING_TO_PAUSE");
+                    Log.v(TAG, "RUNNING_TO_PAUSE");
                     // 暂停的逻辑
                     synchronized (uploadTask) {
                         try {
@@ -242,7 +242,7 @@ public class FileTransportUtils {
 
             // 如果当任务已经被删除
             if (uploadTask.status == UploadManager.DELETE) {
-                Log.v(TAG,"任务已被删除");
+                Log.v(TAG, "任务已被删除");
                 if (uploadTask.switch_status == UploadManager.RUNNING_TO_DELETE) {
                     UploadTaskCallback callback = uploadTask.uploadTaskCallback;
                     if (callback != null) {
@@ -250,6 +250,7 @@ public class FileTransportUtils {
                     }
                     break;
                 } else if (uploadTask.switch_status == UploadManager.PAUSE_TO_DELETE) {
+                    Log.v(TAG, "暂停过程中删除");
                     UploadTaskCallback callback = uploadTask.uploadTaskCallback;
                     if (callback != null) {
                         callback.finished(uploadTask);

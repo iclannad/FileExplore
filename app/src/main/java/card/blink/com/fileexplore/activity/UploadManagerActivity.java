@@ -1,5 +1,6 @@
 package card.blink.com.fileexplore.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.text.format.Formatter;
@@ -91,6 +92,8 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
     public void startAll() {
         Log.v(TAG, "startAll");
         UploadManager.getInstance().startAllTask();
+        // 开启服务
+        startService(new Intent(this, UploadService.class));
         adapter.notifyDataSetChanged();
     }
 
@@ -127,6 +130,11 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
                 holder = (ViewHolder) convertView.getTag();
             }
             holder.name.setText(uploadTask.name);
+
+            String name = uploadTask.name;
+            long index = uploadTask.index;
+            long count = uploadTask.count;
+            Log.v(TAG, "name==" + name + "---index==" + index + "---count==" + count);
 
             holder.refresh(uploadTask);
 
@@ -173,10 +181,18 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
         }
 
         private void refresh() {
+            if (uploadTask.status == UploadManager.DELETE) {
+                Log.v(TAG, "任务已经被删除");
+                return;
+            }
             if (uploadTask.status == UploadManager.PAUSE) {
                 netSpeed.setText("暂停中");
                 return;
             }
+            if (uploadTask.status == UploadManager.RUNING) {
+                upload.setText("暂停");
+            }
+
 
             float progress = uploadTask.index * 1.0f / uploadTask.count;
             String jd = (Math.round(progress * 10000) * 1.0f / 100) + "%";
@@ -231,8 +247,12 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
                         synchronized (uploadTask) {
                             uploadTask.notify();
                         }
+                    } else if (uploadTask.switch_status == UploadManager.WAIT_TO_PAUSE) {
+                        uploadTask.status = UploadManager.WAIT;
+                        uploadTask.switch_status = UploadManager.PAUSE_TO_WAIT;
                     }
                     upload.setText("暂停");
+                    startService(new Intent(UploadManagerActivity.this, UploadService.class));
                 }
 
 
@@ -250,12 +270,13 @@ public class UploadManagerActivity extends UploadAndDownloadBaseActivity {
                     uploadTask.switch_status = UploadManager.WAIT_TO_DELETE;
                 } else if (uploadTask.status == UploadManager.PAUSE) {
                     // 任务在暂停时删除
+                    Log.v(TAG, "暂停过程中删除");
                     uploadTask.status = UploadManager.DELETE;
                     uploadTask.switch_status = UploadManager.PAUSE_TO_DELETE;
-                    UploadManager.getInstance().removeTask(uploadTask);
                     synchronized (uploadTask) {
                         uploadTask.notify();
                     }
+                    UploadManager.getInstance().removeTask(uploadTask);
                 } else if (uploadTask.status == UploadManager.FINISH) {
                     // 任务下载完成时删除
                     if (uploadTask.switch_status == UploadManager.RUNNING_TO_FINISH) {
