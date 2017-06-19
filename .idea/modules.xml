@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/UI_SDK/UI_SDK.iml" filepath="$PROJECT_DIR$/UI_SDK/UI_SDK.iml" />
       <module fileurl="file://$PROJECT_DIR$/Widgets/Widgets.iml" filepath="$PROJECT_DIR$/Widgets/Widgets.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dbdemo/dbdemo.iml" filepath="$PROJECT_DIR$/dbdemo/dbdemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/filetransportdemo/filetransportdemo.iml" filepath="$PROJECT_DIR$/filetransportdemo/filetransportdemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/httpdemo/httpdemo.iml" filepath="$PROJECT_DIR$/httpdemo/httpdemo.iml" />
       <module fileurl="file://$PROJECT_DIR$/okgo/okgo.iml" filepath="$PROJECT_DIR$/okgo/okgo.iml" />

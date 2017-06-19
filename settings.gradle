@@ -1,1 +1,1 @@
-include ':app', ':UI_SDK', ':httpdemo', ':Widgets', ':filetransportdemo', ':okgo', ':okserver', ':okrx'
+include ':app', ':UI_SDK', ':httpdemo', ':Widgets', ':filetransportdemo', ':okgo', ':okserver', ':okrx', ':dbdemo'
