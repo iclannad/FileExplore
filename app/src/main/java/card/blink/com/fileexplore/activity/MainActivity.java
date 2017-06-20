@@ -55,18 +55,24 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
+            if (lv != null) {
+                lv.onRefreshComplete();
+            }
             switch (msg.what) {
                 case Comment.ERROR:
+                    MyProgressDIalog.getInstance(MainActivity.this).dissmissProgress();
                     Log.i(TAG, "获取数据失败");
+                    handlerFailEvent();
+                    break;
+                case Comment.UN_NORMAL:
+                    MyProgressDIalog.getInstance(MainActivity.this).dissmissProgress();
                     int result = (int) msg.obj;
-                    handlerFailEvent(result);
+                    handlerUnNormal(result);
                     break;
                 case Comment.SUCCESS:
                     // 关闭对话框
                     MyProgressDIalog.getInstance(MainActivity.this).dissmissProgress();
-                    if (lv != null) {
-                        lv.onRefreshComplete();
-                    }
+
                     Log.i(TAG, "获取数据成功");
                     FileListData data = (FileListData) msg.obj;
                     handlerSuccessEvent(data);
@@ -95,7 +101,23 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
     /**
      * 处理获取列表数据失败的事件
      */
-    private void handlerFailEvent(int result) {
+    private void handlerFailEvent() {
+        Log.v(TAG, "获取数据失败");
+        Toast.makeText(this, "获取数据失败，请检查连接是否正确", Toast.LENGTH_SHORT).show();
+        MainActivity.this.finish();
+    }
+
+    /**
+     * 处理无硬盘挂载的逻辑
+     */
+    private void handlerUnNormal(int reuslt) {
+        if (reuslt == 2) {
+            Toast.makeText(this, "获取数据失败，请检查硬盘是否正确加载", Toast.LENGTH_SHORT).show();
+            MainActivity.this.finish();
+        } else if (reuslt == 4) {
+            Toast.makeText(this, "获取数据失败，请求路径不正确", Toast.LENGTH_SHORT).show();
+        }
+
 
     }
 
@@ -218,7 +240,7 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                 FileTransportUtils.postRequest(currentPath, handler);
             }
         });
-
+        MyProgressDIalog.getInstance(MainActivity.this).setContent("检查环境……").showProgressDialog();
         AllFile();
 
     }

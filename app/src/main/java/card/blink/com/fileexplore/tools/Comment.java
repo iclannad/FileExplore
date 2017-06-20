@@ -23,6 +23,7 @@ public class Comment {
 
     public static final int ERROR = -1;
     public static final int SUCCESS = 1;
+    public static final int UN_NORMAL = 2;
     public static final int UPLOAD_SUCCESS = 3;
     public static final int UPLOADING = 4;
 

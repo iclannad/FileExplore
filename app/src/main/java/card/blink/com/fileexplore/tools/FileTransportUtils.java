@@ -138,7 +138,7 @@ public class FileTransportUtils {
                     FileListData data = gson.fromJson(content, FileListData.class);
                     Log.d(TAG, data.toString());
                     int result = data.result;
-                    Log.i(TAG, result + "");
+                    Log.i(TAG, "result==" + result + "");
                     if (result == 0) {
                         Message msg = Message.obtain();
                         msg.what = Comment.SUCCESS;
@@ -146,13 +146,15 @@ public class FileTransportUtils {
                         handler.sendMessage(msg);
                     } else {
                         Message msg = Message.obtain();
-                        msg.what = Comment.ERROR;
+                        msg.what = Comment.UN_NORMAL;
                         msg.obj = result;
                         handler.sendMessage(msg);
                     }
                 } catch (IOException e) {
                     //e.printStackTrace();
-                    handler.sendEmptyMessage(Comment.ERROR);
+                    Message msg = Message.obtain();
+                    msg.what = Comment.ERROR;
+                    handler.sendMessage(msg);
 
                 }
             }
