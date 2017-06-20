@@ -26,6 +26,7 @@ public class Comment {
     public static final int UN_NORMAL = 2;
     public static final int UPLOAD_SUCCESS = 3;
     public static final int UPLOADING = 4;
+    public static final int UPLOADING_EXISTS = 5;
 
 
 }

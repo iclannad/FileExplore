@@ -72,7 +72,6 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                 case Comment.SUCCESS:
                     // 关闭对话框
                     MyProgressDIalog.getInstance(MainActivity.this).dissmissProgress();
-
                     Log.i(TAG, "获取数据成功");
                     FileListData data = (FileListData) msg.obj;
                     handlerSuccessEvent(data);
@@ -89,6 +88,11 @@ public class MainActivity extends BaseActivity implements AdapterView.OnItemClic
                         Log.v(TAG, "我现在在主线程");
                         uploadTask.uploadListener.onProgress(uploadTask);
                     }
+                    break;
+                case Comment.UPLOADING_EXISTS:
+                    Log.v(TAG, "存在上传文件");
+                    UploadTask uploadTaskExists = (UploadTask) msg.obj;
+                    Toast.makeText(MainActivity.this, "文件：" + uploadTaskExists.name + "已存在", Toast.LENGTH_SHORT).show();
                     break;
                 default:
 

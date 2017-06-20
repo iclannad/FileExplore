@@ -11,14 +11,14 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.wyk.greendaodemo.greendao.gen.UploadTaskDao;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.callback.FileCallBack;
 
-import org.greenrobot.greendao.query.WhereCondition;
-
 import java.io.File;
 import java.io.IOException;
+import java.security.interfaces.RSAKey;
 import java.util.Arrays;
 
 import card.blink.com.fileexplore.gson.FileListData;
@@ -26,6 +26,7 @@ import card.blink.com.fileexplore.model.UploadTask;
 import card.blink.com.fileexplore.service.UploadTaskCallback;
 import card.blink.com.fileexplore.upload.GreenDaoManager;
 import card.blink.com.fileexplore.upload.UploadManager;
+import card.blink.com.fileexplore.upload.UploadTaskResult;
 import okhttp3.Call;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
@@ -221,7 +222,8 @@ public class FileTransportUtils {
 
             // 请求上传index块
             long timeMillisBefore = System.currentTimeMillis();
-            uploading(file, index, count, uploadTask.toUrl, uploadTask.handler);
+            int result = uploading(file, index, count, uploadTask.toUrl, uploadTask.handler);
+
             try {
                 Thread.sleep(20);
             } catch (InterruptedException e) {
@@ -234,6 +236,24 @@ public class FileTransportUtils {
 
             uploadTask.index = index;
             uploadTask.count = count;
+
+            if (result == 2) {
+                Log.v(TAG, "上传目录已存在此文件");
+                // 更新任务的状态为完成
+                uploadTask.status = UploadManager.FINISH;
+                uploadTask.switch_status = UploadManager.RUNNING_TO_FINISH;
+                // 更新数据库里面的状态
+                UploadTaskDao uploadTaskDao = GreenDaoManager.getInstance().getSession().getUploadTaskDao();
+                uploadTaskDao.update(uploadTask);
+
+                if (uploadTask.handler != null) {
+                    Message msg = Message.obtain();
+                    msg.obj = uploadTask;
+                    msg.what = Comment.UPLOADING_EXISTS;
+                    uploadTask.handler.sendMessage(msg);
+                }
+                break;
+            }
 
             if (index == count && index != 0) {
                 // 更新任务的状态为完成
@@ -284,7 +304,9 @@ public class FileTransportUtils {
 
     }
 
-    private static void uploading(File file, int index, long count, String uploadPath, Handler handler) {
+    private static int uploading(File file, int index, long count, String uploadPath, Handler handler) {
+        int result = -1;
+
         byte[] content = getDataFromLocalFile(file, index, count, uploadPath);
         Log.i(TAG, "btn");
         OkHttpClient client = new OkHttpClient();
@@ -304,13 +326,29 @@ public class FileTransportUtils {
 
         try {
             Response response = client.newCall(request).execute();
-            Log.i(TAG, "response==" + response.toString());
+            Log.v(TAG, "response==" + response.toString());
             ResponseBody responseBody = response.body();
-            Log.i(TAG, "responseBody==" + responseBody.toString());
+            Log.v(TAG, "responseBody==" + responseBody.toString());
             String string = responseBody.string();
-            Log.i(TAG, "responseBody.string()==" + string);
+            Log.v(TAG, "responseBody.string()==" + string);
+
+
+            Gson gson = new Gson();
+            UploadTaskResult uploadTaskResult = gson.fromJson(string, UploadTaskResult.class);
+            Log.v(TAG, "uploadTaskResult==" + uploadTaskResult.result);
+            result = uploadTaskResult.result;
+
+
+            int code = response.code();
+            Log.v(TAG, "code==" + code);
 
             Log.v(TAG, "index===" + index + "   count===" + count);
+
+            // TODO: 2017/6/20  
+            if (result == 2) {
+                return result;
+            }
+
             // 上传最后一块完成时，文件上传成功
             if (index == count) {
                 if (handler != null) {
@@ -328,6 +366,7 @@ public class FileTransportUtils {
             e.printStackTrace();
         }
 
+        return result;
     }
 
     /**
