@@ -252,6 +252,12 @@ public class FileTransportUtils {
                     msg.what = Comment.UPLOADING_EXISTS;
                     uploadTask.handler.sendMessage(msg);
                 }
+
+                // 回调给service
+                UploadTaskCallback callback = uploadTask.uploadTaskCallback;
+                if (callback != null) {
+                    callback.finished(uploadTask);
+                }
                 break;
             }
 
@@ -344,7 +350,7 @@ public class FileTransportUtils {
 
             Log.v(TAG, "index===" + index + "   count===" + count);
 
-            // TODO: 2017/6/20  
+            // TODO: 2017/6/20
             if (result == 2) {
                 return result;
             }
